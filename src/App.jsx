@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope, FaArrowUp, FaReact, FaNodeJs, FaDatabase, FaServer, FaJs, FaHtml5, FaGitAlt, FaCode, FaFilePowerpoint, FaWpforms } from "react-icons/fa";
-import { 
+import {
   SiCss3,
   SiJavascript,
   SiTailwindcss,
@@ -52,7 +52,7 @@ const App = () => {
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
-      
+
       // Update active section based on scroll position
       const sections = document.querySelectorAll('section');
       const scrollPosition = window.scrollY + 100;
@@ -94,6 +94,14 @@ const App = () => {
       image: "https://placehold.co/400x300/23232B/ffffff?text=UrbanHut+E-Commerce",
     },
     {
+      title: "Baytebar",
+      description: "A professional IT solution website developed as a commercial project. This project demonstrates my ability to deliver business-ready web solutions.",
+      technologies: ["React", "Tailwind CSS", "Vite"],
+      githubLink: "https://github.com/yourusername/it-solution-website",
+      liveLink: "https://baytebar.com/",
+      image: "https://placehold.co/400x300/23232B/ffffff?text=BAYTEBAR",
+    },
+    {
       title: "Bank Website",
       description: "A modern bank website project built for personal learning and experimentation. This is not a commercial project, but a showcase of my frontend and UI/UX skills.",
       technologies: ["React", "Tailwind CSS", "Vite"],
@@ -125,14 +133,6 @@ const App = () => {
       liveLink: "https://magenta-cucurucho-c3f8ae.netlify.app/",
       image: "https://placehold.co/400x300/23232B/ffffff?text=College+Website",
     },
-    {
-      title: "IT Solution Website",
-      description: "A professional IT solution website developed as a commercial project. This project demonstrates my ability to deliver business-ready web solutions. (Will be officially hosted soon)",
-      technologies: ["React", "Tailwind CSS", "Vite"],
-      githubLink: "https://github.com/yourusername/it-solution-website",
-      liveLink: "https://calm-chimera-3f4fa4.netlify.app/",
-      image: "https://placehold.co/400x300/23232B/ffffff?text=IT+Solution+Website",
-    },
   ];
 
   const skills = [
@@ -151,7 +151,7 @@ const App = () => {
     { name: "Git", icon: SiGit, color: "#F05032" },
     { name: "GitHub", icon: SiGithub, color: "#181717" },
   ];
-  
+
   const tools = [
     { name: "VS Code", icon: VscCode, color: "#007ACC" },
     { name: "ChatGPT", icon: SiOpenai, color: "#74AA9C" },
@@ -221,7 +221,7 @@ const App = () => {
       </main>
       <Footer />
     </div>
-  );  
+  );
 };
 
 export default App;
