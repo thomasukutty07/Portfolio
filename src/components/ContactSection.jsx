@@ -1,133 +1,177 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef, useState } from 'react';
+import { gsap }          from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
-const ContactSection = ({ formData, formStatus, handleChange, handleSubmit }) => (
-  <section id="contact" className="py-16 sm:py-24 md:py-32 relative">
-    <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-8">
-      {/* Support badge */}
-      <div className="flex justify-center mb-4 sm:mb-6">
-        <div className="flex items-center gap-2 px-3 sm:px-4 py-1 bg-[#18181B]/80 border border-[#2D2D2D] rounded-full text-xs sm:text-sm text-gray-300 shadow-sm">
-          <span className="inline-flex items-center gap-1">
-            <svg className="w-4 h-4 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6a2 2 0 012-2h2a2 2 0 012 2v13" /></svg>
-            4 Support online
-          </span>
-          <span className="mx-2">·</span>
-          <a href="#" className="text-[#A855F7] hover:underline font-medium">Join us</a>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── Magnetic submit button ── */
+const MagBtn = ({ children, ...props }) => {
+  const ref = useRef();
+  const onMove = (e) => {
+    const r  = ref.current.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width/2))  * 0.3;
+    const dy = (e.clientY - (r.top  + r.height/2)) * 0.3;
+    gsap.to(ref.current, { x: dx, y: dy, duration: 0.35, ease: 'power2.out' });
+  };
+  const onLeave = () => gsap.to(ref.current, { x: 0, y: 0, duration: 0.55, ease: 'elastic.out(1,0.4)' });
+  return (
+    <button ref={ref} {...props} onMouseMove={onMove} onMouseLeave={onLeave}>{children}</button>
+  );
+};
+
+export default function ContactSection({ formData, formStatus, handleChange, handleSubmit }) {
+  const sectionRef = useRef(null);
+  const topRef     = useRef(null);
+  const formRef    = useRef(null);
+  const linksRef   = useRef(null);
+  const [focused, setFocused] = useState(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const triggers = [];
+    gsap.set([topRef.current, formRef.current, linksRef.current], { opacity: 0, y: 36 });
+    triggers.push(ScrollTrigger.create({
+      trigger: sectionRef.current, start: 'top 85%', once: true,
+      onEnter: () => {
+        gsap.to(topRef.current,   { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' });
+        gsap.to(formRef.current,  { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out', delay: 0.14 });
+        gsap.to(linksRef.current, { opacity: 1, y: 0, duration: 0.8,  ease: 'power3.out', delay: 0.26 });
+      },
+    }));
+    const fb = setTimeout(() => {
+      [topRef, formRef, linksRef].forEach(r => {
+        if (r.current) gsap.set(r.current, { opacity: 1, y: 0 });
+      });
+    }, 2800);
+    return () => { triggers.forEach(t => t.kill()); clearTimeout(fb); };
+  }, []);
+
+  const links = [
+    { icon: FaEnvelope, label: 'Email',    value: 'thomasmern007@gmail.com',    href: 'mailto:thomasmern007@gmail.com' },
+    { icon: FaGithub,   label: 'GitHub',   value: 'github.com/thomasukutty07',  href: 'https://github.com/thomasukutty07' },
+    { icon: FaLinkedin, label: 'LinkedIn', value: 'Thomasukutty Reji',           href: 'https://www.linkedin.com/in/thomasukutty-reji-431b9027b/' },
+  ];
+
+  const iStyle = (name) => ({
+    borderColor: focused === name ? 'var(--lime)' : undefined,
+    background:  focused === name ? 'var(--lime-03)' : undefined,
+  });
+
+  return (
+    <section id="contact" ref={sectionRef} className="contact">
+      <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
+
+        {/* Big header */}
+        <div ref={topRef}>
+          <div className="sec-label" style={{ marginBottom: '2rem' }}>Contact</div>
+          <h2 style={{ fontFamily: 'var(--display)', fontSize: 'clamp(3rem, 7vw, 6rem)', lineHeight: 0.95, letterSpacing: '0.02em', color: 'var(--white)', marginBottom: '2.5rem' }}>
+            LET'S BUILD<br /><span style={{ color: 'var(--lime)' }}>SOMETHING</span><br />GREAT
+          </h2>
+
+          {/* Big email */}
+          <a
+            href="mailto:thomasmern007@gmail.com"
+            className="contact-big-email"
+            data-text="thomasmern007@gmail.com"
+          >
+            thomasmern007@gmail.com
+          </a>
+        </div>
+
+        {/* 2-col layout */}
+        <div className="contact-grid">
+          {/* Form */}
+          <div ref={formRef}>
+            {formStatus.success && (
+              <div style={{ background: 'rgba(163,255,71,0.08)', border: '1px solid rgba(163,255,71,0.25)', color: 'var(--lime)', padding: '0.9rem 1.1rem', marginBottom: '1.5rem', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.6rem', animation: 'scale-in 0.3s ease' }}>
+                ✓ Message sent — I'll be in touch soon!
+              </div>
+            )}
+            {formStatus.error && (
+              <div style={{ background: 'rgba(255,77,109,0.07)', border: '1px solid rgba(255,77,109,0.25)', color: '#FF4D6D', padding: '0.9rem 1.1rem', marginBottom: '1.5rem', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                ✕ Something went wrong — please try again.
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="f-group">
+              <div className="f-row">
+                <div>
+                  <label className="f-label" htmlFor="firstName">Name *</label>
+                  <input className="contact-input" id="firstName" name="firstName" type="text"
+                    value={formData.firstName || ''} onChange={handleChange} required
+                    placeholder="Thomas" style={iStyle('firstName')}
+                    onFocus={() => setFocused('firstName')} onBlur={() => setFocused(null)}
+                  />
+                </div>
+                <div>
+                  <label className="f-label" htmlFor="email">Email *</label>
+                  <input className="contact-input" id="email" name="email" type="email"
+                    value={formData.email} onChange={handleChange} required
+                    placeholder="you@example.com" style={iStyle('email')}
+                    onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="f-label" htmlFor="subject">Subject</label>
+                <input className="contact-input" id="subject" name="subject" type="text"
+                  value={formData.subject || ''} onChange={handleChange}
+                  placeholder="Project inquiry…" style={iStyle('subject')}
+                  onFocus={() => setFocused('subject')} onBlur={() => setFocused(null)}
+                />
+              </div>
+              <div>
+                <label className="f-label" htmlFor="message">Message *</label>
+                <textarea className="contact-input" id="message" name="message"
+                  value={formData.message} onChange={handleChange} required
+                  placeholder="Tell me about your project…" style={iStyle('message')}
+                  onFocus={() => setFocused('message')} onBlur={() => setFocused(null)}
+                />
+              </div>
+
+              <MagBtn
+                type="submit"
+                disabled={formStatus.submitting}
+                className="btn-lime"
+                style={{ width: '100%', justifyContent: 'center', fontSize: '0.72rem', padding: '1rem', opacity: formStatus.submitting ? 0.65 : 1, cursor: formStatus.submitting ? 'not-allowed' : 'pointer', clipPath: 'none', borderRadius: 0 }}
+              >
+                {formStatus.submitting
+                  ? <><div style={{ width: 16, height: 16, border: '2px solid rgba(5,5,5,0.3)', borderTopColor: '#050505', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />  Sending…</>
+                  : <>Send Message →</>
+                }
+              </MagBtn>
+            </form>
+          </div>
+
+          {/* Right — links + info */}
+          <div ref={linksRef}>
+            <p style={{ color: 'var(--white-60)', fontSize: '0.9rem', lineHeight: 1.88, marginBottom: '2.5rem', fontWeight: 300 }}>
+              Whether it's a startup MVP, a freelance project, or just wanting to say hello — my inbox is always open.
+            </p>
+
+            <div className="contact-links">
+              {links.map(({ icon: Icon, label, value, href }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="contact-link">
+                  <Icon className="contact-link-icon" />
+                  <div>
+                    <div className="contact-link-label">{label}</div>
+                    <div className="contact-link-val">{value}</div>
+                  </div>
+                  <span className="contact-link-arr">↗</span>
+                </a>
+              ))}
+            </div>
+
+            <div className="avail-badge">
+              <span className="avail-dot" />
+              Available for freelance &amp; full-time — response within 24h
+            </div>
+          </div>
         </div>
       </div>
-      {/* Heading and subheading */}
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-white mb-2 sm:mb-4">Lets Have a Chat <span className="inline-block">👋</span></h2>
-      <p className="text-center text-gray-400 text-base sm:text-lg mb-6 sm:mb-12 max-w-2xl mx-auto">Questions about our products/services, orders, or just want to say hello? We're here to help</p>
-      {/* Contact Form Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="relative bg-[#18181B]/80 backdrop-blur-lg rounded-3xl p-4 sm:p-8 md:p-12 shadow-2xl border border-[#2D2D2D] overflow-hidden"
-      >
-        <AnimatePresence>
-          {formStatus.success && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-green-500/20 border border-green-500 text-green-500 px-4 py-3 rounded-lg mb-4 flex items-center gap-3 z-10 justify-center"
-            >
-              <svg className="w-6 h-6 text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              Message sent successfully! I'll get back to you soon.
-            </motion.div>
-          )}
-          {formStatus.error && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4 flex items-center gap-3 z-10 justify-center"
-            >
-              <svg className="w-6 h-6 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              Failed to send message. Please try again later.
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-2 sm:mt-4">
-          {/* First Name */}
-          <div className="flex flex-col gap-1 sm:gap-2">
-            <label htmlFor="firstName" className="text-gray-400 text-xs sm:text-sm">First name</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName || ''}
-              onChange={e => handleChange(e)}
-              required
-              placeholder="Jonathan"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-[#23232B] border border-[#2D2D2D] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-all placeholder-gray-500"
-            />
-          </div>
-          {/* Email */}
-          <div className="flex flex-col gap-1 sm:gap-2">
-            <label htmlFor="email" className="text-gray-400 text-xs sm:text-sm">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={e => handleChange(e)}
-              required
-              placeholder="Jonathan2718@gmail.com"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-[#23232B] border border-[#2D2D2D] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-all placeholder-gray-500"
-            />
-          </div>
-          {/* Phone Number */}
-          <div className="flex flex-col gap-1 sm:gap-2">
-            <label htmlFor="subject" className="text-gray-400 text-xs sm:text-sm">Phone number</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              value={formData.subject || ''}
-              onChange={e => handleChange(e)}
-              required
-              placeholder="Phone number"
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-[#23232B] border border-[#2D2D2D] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-all placeholder-gray-500"
-            />
-          </div>
-          {/* Message (full width) */}
-          <div className="flex flex-col gap-1 sm:gap-2 md:col-span-2">
-            <label htmlFor="message" className="text-gray-400 text-xs sm:text-sm">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={e => handleChange(e)}
-              required
-              rows="3"
-              placeholder="Hey I have some issues activating my account..."
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-[#23232B] border border-[#2D2D2D] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#A855F7] transition-all placeholder-gray-500 resize-none"
-            ></textarea>
-          </div>
-          {/* Send Button (full width) */}
-          <div className="md:col-span-2 mt-2">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={formStatus.submitting}
-              className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-full font-bold text-base sm:text-lg bg-gradient-to-r from-[#23232B] to-[#353542] text-white shadow-lg transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 ${formStatus.submitting ? "opacity-50 cursor-not-allowed" : "hover:from-[#353542] hover:to-[#23232B]/80"}`}
-            >
-              {formStatus.submitting ? (
-                <>
-                  <svg className="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="4" className="opacity-25" /><path d="M4 12a8 8 0 018-8" stroke="#fff" strokeWidth="4" className="opacity-75" /></svg>
-                  Sending...
-                </>
-              ) : (
-                <>Send message</>
-              )}
-            </motion.button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
-  </section>
-);
 
-export default ContactSection; 
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </section>
+  );
+}

@@ -1,63 +1,96 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 
-const Navbar = ({ sections, activeSection, scrollToSection }) => {
-  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
+export default function Navbar({ sections, activeSection, scrollToSection }) {
+  const [scrolled,   setScrolled]   = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    if (navRef.current) {
+      gsap.fromTo(navRef.current,
+        { y: -60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.1, ease: 'power4.out', delay: 0.3 }
+      );
+    }
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 w-full bg-[#0A0A0A]/90 backdrop-blur-lg z-50 border-b border-[#2D2D2D]"
-    >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xl sm:text-2xl font-bold"
-          >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3366] to-[#4F46E5]">
-              Thomasukutty Reji
-            </span>
-          </motion.h1>
-          {/* Mobile menu toggle */}
-          <div className="md:hidden">
-            <button onClick={() => setShowMobileMenu((prev) => !prev)} className="text-gray-400 hover:text-white focus:outline-none">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </button>
-          </div>
-          <div className="hidden md:flex space-x-8 sm:space-x-12">
-            {sections.map((section) => (
-              <motion.button
-                key={section.id}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => scrollToSection(section.id)}
-                className={`text-gray-400 hover:text-white transition-colors cursor-pointer ${activeSection === section.id ? "text-white font-bold" : ""}`}
-              >
-                {section.label}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-        {/* Mobile menu dropdown */}
-        {showMobileMenu && (
-          <div className="md:hidden flex flex-col space-y-2 mt-2">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => { scrollToSection(section.id); setShowMobileMenu(false); }}
-                className={`text-gray-400 hover:text-white transition-colors cursor-pointer text-left px-2 py-2 rounded ${activeSection === section.id ? "text-white font-bold bg-[#18181B]" : ""}`}
-              >
-                {section.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </motion.nav>
-  );
-};
+    <>
+      <nav ref={navRef} className={`nav ${scrolled ? 'scrolled' : ''}`}>
+        <a className="nav-logo" href="#home"
+          onClick={e => { e.preventDefault(); scrollToSection('home'); }}
+        >
+          &lt;<span>TR</span>/&gt;
+        </a>
 
-export default Navbar; 
+        <ul className="nav-links">
+          {sections.map(({ id, label }) => (
+            <li key={id}>
+              <button
+                className={`nav-link ${activeSection === id ? 'active' : ''}`}
+                onClick={() => scrollToSection(id)}
+              >
+                {label}
+              </button>
+            </li>
+          ))}
+          <li>
+            <a
+              href="https://www.linkedin.com/in/thomasukutty-reji-431b9027b/"
+              target="_blank" rel="noopener noreferrer"
+              className="nav-hire"
+            >
+              Hire Me ↗
+            </a>
+          </li>
+        </ul>
+
+        <button
+          className="mob-btn"
+          onClick={() => setMobileOpen(o => !o)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen
+            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          }
+        </button>
+      </nav>
+
+      {mobileOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, top: 0,
+          background: 'rgba(5,5,5,0.97)', backdropFilter: 'blur(20px)',
+          zIndex: 999, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: '3rem',
+          borderTop: '1px solid var(--border)',
+        }}>
+          <button
+            onClick={() => setMobileOpen(false)}
+            style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: '1px solid var(--border2)', padding: '0.4rem 0.6rem', cursor: 'pointer', color: 'var(--white)' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          {sections.map(({ id, label }) => (
+            <button key={id}
+              onClick={() => { scrollToSection(id); setMobileOpen(false); }}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--display)', fontSize: 'clamp(2.5rem,8vw,4rem)',
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                color: activeSection === id ? 'var(--lime)' : 'var(--white-60)',
+                transition: 'color 0.2s',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}

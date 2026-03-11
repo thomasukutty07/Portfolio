@@ -1,170 +1,388 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { FaGithub } from "react-icons/fa";
+import React, { useEffect, useRef, useState } from 'react';
+import { gsap }          from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FaExternalLinkAlt, FaGithub, FaTimes } from 'react-icons/fa';
 
-const ProjectsSection = ({ projects }) => (
-  <section id="projects" className="py-16 sm:py-24 md:py-32 relative">
-    {/* Minimalist Background */}
-    <div className="absolute inset-0">
-      <div className="absolute inset-0 bg-[#0A0A0A]"></div>
-      {/* Geometric Lines */}
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#FF3366]/20 to-transparent"></div>
-        <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#4F46E5]/20 to-transparent"></div>
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-[#FF3366]/20 to-transparent"></div>
-        <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-[#4F46E5]/20 to-transparent"></div>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ─────────────────── MODAL ─────────────────── */
+const Modal = ({ project, onClose }) => {
+  const backdropRef = useRef();
+  const boxRef      = useRef();
+
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', handleKey); document.body.style.overflow = ''; };
+  }, []);
+
+  const close = () => {
+    gsap.to(boxRef.current,      { opacity: 0, y: 24, duration: 0.28, ease: 'power3.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: 0.35, onComplete: onClose });
+  };
+
+  return (
+    <div ref={backdropRef} className="modal-backdrop"
+      onClick={e => { if (e.target === backdropRef.current) close(); }}
+    >
+      <div ref={boxRef} className="modal" style={{ position: 'relative' }}>
+        <button className="modal-close" onClick={close}><FaTimes /></button>
+        <img src={project.image} alt={project.title} className="modal-img" />
+        <div className="modal-body">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
+            {project.technologies.map(t => (
+              <span key={t} style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', padding: '0.15rem 0.6rem', border: '1px solid rgba(163,255,71,0.3)', color: 'var(--lime)', background: 'rgba(163,255,71,0.06)', letterSpacing: '0.06em' }}>{t}</span>
+            ))}
+          </div>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', color: 'var(--white)', letterSpacing: '0.04em', marginBottom: '0.8rem', lineHeight: 1.1 }}>{project.title}</h3>
+          <p style={{ color: 'var(--white-60)', lineHeight: 1.85, fontSize: '0.9rem', marginBottom: '2rem' }}>{project.description}</p>
+          <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
+            <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn-lime" style={{ textDecoration: 'none', padding: '0.75rem 1.5rem', fontSize: '0.7rem' }}>
+              <FaExternalLinkAlt style={{ fontSize: '0.65rem' }} /> Live Demo
+            </a>
+            <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ textDecoration: 'none', padding: '0.75rem 1.5rem', fontSize: '0.7rem' }}>
+              <FaGithub /> Source Code
+            </a>
+          </div>
+        </div>
       </div>
-      {/* Corner Accents */}
-      <div className="absolute top-8 left-8 w-16 h-16 sm:top-20 sm:left-20 sm:w-32 sm:h-32 border-l-2 border-t-2 border-[#FF3366]/30"></div>
-      <div className="absolute bottom-8 right-8 w-16 h-16 sm:bottom-20 sm:right-20 sm:w-32 sm:h-32 border-r-2 border-b-2 border-[#4F46E5]/30"></div>
     </div>
-    <div className="max-w-6xl mx-auto relative z-10 px-2 sm:px-4 md:px-8">
-      {/* Section Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-16 sm:mb-24 md:mb-32"
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="inline-block mb-4 sm:mb-8"
+  );
+};
+
+/* ─────────────────── HORIZONTAL PROJECT CARD ─────────────────── */
+const ProjectCard = ({ project, index, accentColor, onClick }) => {
+  const cardRef = useRef();
+
+  const onEnter = () => {
+    gsap.to(cardRef.current.querySelector('.pc-img'), { scale: 1.06, duration: 0.55, ease: 'power2.out' });
+    gsap.to(cardRef.current.querySelector('.pc-arrow'), { rotate: 0, opacity: 1, duration: 0.3 });
+  };
+  const onLeave = () => {
+    gsap.to(cardRef.current.querySelector('.pc-img'), { scale: 1, duration: 0.55, ease: 'power2.out' });
+    gsap.to(cardRef.current.querySelector('.pc-arrow'), { rotate: -45, opacity: 0.4, duration: 0.3 });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={onClick}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      style={{
+        width: 'clamp(320px, 38vw, 520px)',
+        flexShrink: 0,
+        background: 'linear-gradient(145deg, #181816 0%, #111110 100%)',
+        border: '1px solid rgba(240,240,236,0.1)',
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'border-color 0.3s, box-shadow 0.3s',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+      onMouseEnter2={e => e.currentTarget.style.borderColor = accentColor + '55'}
+      onMouseLeave2={e => e.currentTarget.style.borderColor = 'var(--border)'}
+    >
+      {/* Image */}
+      <div style={{ overflow: 'hidden', height: '240px', position: 'relative', flexShrink: 0 }}>
+        <img
+          className="pc-img"
+          src={project.image}
+          alt={project.title}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transformOrigin: 'center', transition: 'transform 0.55s' }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.75) 100%)', pointerEvents: 'none' }} />
+
+        {/* Index badge */}
+        <div style={{
+          position: 'absolute', top: '1rem', left: '1.1rem',
+          fontFamily: 'var(--display)', fontSize: '4rem', color: 'rgba(255,255,255,0.06)',
+          lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+        }}>
+          {String(index + 1).padStart(2, '0')}
+        </div>
+
+        {/* Live badge */}
+        <div style={{
+          position: 'absolute', top: '1rem', right: '1rem',
+          padding: '0.2rem 0.65rem', fontFamily: 'var(--mono)', fontSize: '0.48rem',
+          border: `1px solid ${accentColor}55`, color: accentColor,
+          background: 'rgba(12,12,10,0.85)', backdropFilter: 'blur(8px)',
+          letterSpacing: '0.12em', textTransform: 'uppercase',
+          display: 'flex', alignItems: 'center', gap: '0.4rem',
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: accentColor, boxShadow: `0 0 6px ${accentColor}` }} />
+          LIVE
+        </div>
+
+        {/* Arrow */}
+        <div
+          className="pc-arrow"
+          style={{
+            position: 'absolute', bottom: '1rem', right: '1rem',
+            width: 36, height: 36,
+            border: `1px solid ${accentColor}55`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: accentColor, fontSize: '0.75rem',
+            transform: 'rotate(-45deg)', opacity: 0.4,
+            backdropFilter: 'blur(6px)', background: 'rgba(12,12,10,0.75)',
+          }}
         >
-          <div className="w-8 sm:w-16 h-px bg-gradient-to-r from-transparent via-[#FF3366] to-transparent mx-auto mb-2 sm:mb-4"></div>
-          <div className="text-xs sm:text-sm text-[#FF3366] font-medium tracking-wider uppercase">Portfolio</div>
-        </motion.div>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 sm:mb-8">
-          Selected
-          <span className="text-[#FF3366] font-normal"> Work</span>
-        </h2>
-        <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-          A curated collection of projects that showcase my expertise in modern web development
+          ↗
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+        {/* Category */}
+        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: accentColor, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Full Stack Project
+        </div>
+
+        {/* Title */}
+        <h3 style={{ fontFamily: 'var(--display)', fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', color: 'var(--white)', letterSpacing: '0.04em', lineHeight: 1.05 }}>
+          {project.title}
+        </h3>
+
+        {/* Description */}
+        <p style={{
+          fontSize: '0.82rem', color: 'var(--white-40)', lineHeight: 1.75,
+          display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+        }}>
+          {project.description}
         </p>
-      </motion.div>
-      {/* Projects List */}
-      <div className="space-y-12 sm:space-y-16 md:space-y-24">
-        {projects.map((project, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.25 }}
-            className="group"
+
+        {/* Tags */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: 'auto' }}>
+          {project.technologies.slice(0, 4).map(t => (
+            <span key={t} style={{
+              fontFamily: 'var(--mono)', fontSize: '0.5rem', padding: '0.14rem 0.55rem',
+              border: '1px solid var(--border2)', color: 'var(--white-40)', letterSpacing: '0.06em',
+            }}>{t}</span>
+          ))}
+          {project.technologies.length > 4 && (
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.5rem', padding: '0.14rem 0.55rem', border: '1px solid var(--border)', color: 'var(--white-20)', letterSpacing: '0.06em' }}>
+              +{project.technologies.length - 4}
+            </span>
+          )}
+        </div>
+
+        {/* Links */}
+        <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+          <a
+            href={project.liveLink} target="_blank" rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="btn-lime"
+            style={{ textDecoration: 'none', padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center', clipPath: 'none' }}
           >
-            <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-16 items-center">
-              {/* Project Image */}
-              <div className="flex-1 w-full">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  className="relative overflow-hidden rounded-2xl shadow-lg border border-[#2D2D2D]"
-                >
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                </motion.div>
+            <FaExternalLinkAlt style={{ fontSize: '0.6rem' }} /> Visit
+          </a>
+          <a
+            href={project.githubLink} target="_blank" rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="btn-ghost"
+            style={{ textDecoration: 'none', padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center' }}
+          >
+            <FaGithub /> Code
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── MAIN SECTION ─────────────────── */
+export default function ProjectsSection({ projects }) {
+  const outerRef  = useRef(null);   // pinned wrapper
+  const stickyRef = useRef(null);   // sticky viewport
+  const railRef   = useRef(null);   // sliding rail
+  const headerRef = useRef(null);
+  const [activeModal, setActiveModal] = useState(null);
+
+  const ACCENTS = ['#A3FF47', '#FF4D6D', '#4DFFEA', '#F59E0B', '#A78BFA', '#EC4899', '#38BDF8'];
+
+  useEffect(() => {
+    if (!outerRef.current || !railRef.current) return;
+
+    // Wait a frame for layout to settle
+    const id = requestAnimationFrame(() => {
+      const railWidth   = railRef.current.scrollWidth;
+      const viewWidth   = stickyRef.current.offsetWidth;
+      const totalScroll = railWidth - viewWidth;
+
+      // Horizontal scrub scrollTrigger
+      const hx = gsap.to(railRef.current, {
+        x: -totalScroll,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: outerRef.current,
+          start: 'top top',
+          // Scroll distance = how far the rail needs to travel + viewport height
+          end: () => `+=${totalScroll + viewWidth * 0.3}`,
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // Header fade-in
+      if (headerRef.current) {
+        gsap.fromTo(headerRef.current,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: outerRef.current, start: 'top 85%', once: true },
+          }
+        );
+      }
+
+      return () => { hx.scrollTrigger?.kill(); hx.kill(); };
+    });
+
+    return () => cancelAnimationFrame(id);
+  }, [projects]);
+
+  return (
+    <section id="projects">
+      {activeModal !== null && (
+        <Modal project={projects[activeModal]} onClose={() => setActiveModal(null)} />
+      )}
+
+      {/* ── Pinned horizontal scroll container ── */}
+      <div ref={outerRef} style={{ background: 'var(--black2)' }}>
+        <div
+          ref={stickyRef}
+          style={{
+            height: '100vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative',
+          }}
+        >
+          {/* Bg watermark number */}
+          <div style={{
+            position: 'absolute', top: '50%', right: '3rem',
+            transform: 'translateY(-50%)',
+            fontFamily: 'var(--display)',
+            fontSize: 'clamp(8rem, 22vw, 20rem)',
+            color: 'rgba(163,255,71,0.03)',
+            lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+            letterSpacing: '-0.02em',
+          }}>02</div>
+
+          {/* Header strip */}
+          <div ref={headerRef} style={{
+            padding: '0 clamp(1.5rem, 5vw, 5rem)',
+            marginBottom: '2.5rem',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: '1rem',
+          }}>
+            <div>
+              <div className="sec-label" style={{ marginBottom: '0.9rem' }}>Portfolio</div>
+              <h2 style={{
+                fontFamily: 'var(--display)',
+                fontSize: 'clamp(2.4rem, 5vw, 5rem)',
+                lineHeight: 0.95, letterSpacing: '0.02em', color: 'var(--white)',
+              }}>
+                SELECTED <span style={{ color: 'var(--lime)' }}>WORK</span>
+              </h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              {/* Scroll hint */}
+              <div style={{
+                fontFamily: 'var(--mono)', fontSize: '0.54rem',
+                color: 'var(--white-40)', letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+              }}>
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+                  <path d="M0 6h16M11 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Scroll to explore
               </div>
-              {/* Project Details */}
-              <div className="flex-1 w-full space-y-4 sm:space-y-8 bg-[#18181B] rounded-2xl p-4 sm:p-8 shadow-lg border border-[#2D2D2D]">
-                <div>
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-xs sm:text-sm text-[#FF3366] font-medium mb-1 sm:mb-2"
-                  >
-                    Project {String(index + 1).padStart(2, '0')}
-                  </motion.div>
-                  <motion.h3
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-white mb-2 sm:mb-6 group-hover:text-[#FF3366] transition-colors duration-300"
-                  >
-                    {project.title}
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-gray-400 leading-relaxed text-base sm:text-lg"
-                  >
-                    {project.description}
-                  </motion.p>
+              <a href="https://github.com/thomasukutty07" target="_blank" rel="noopener noreferrer"
+                className="btn-ghost" style={{ textDecoration: 'none', fontSize: '0.65rem', padding: '0.55rem 1.1rem' }}>
+                <FaGithub /> All Projects
+              </a>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
+            background: 'var(--border)',
+          }}>
+            <div
+              id="proj-progress"
+              style={{ height: '100%', background: 'var(--lime)', width: 0, transition: 'none', boxShadow: '0 0 10px rgba(163,255,71,0.7)' }}
+            />
+          </div>
+
+          {/* ── Horizontal rail ── */}
+          <div style={{ overflow: 'hidden', position: 'relative' }}>
+            <div
+              ref={railRef}
+              style={{
+                display: 'flex',
+                gap: '1.5rem',
+                paddingLeft: 'clamp(1.5rem, 5vw, 5rem)',
+                paddingRight: 'clamp(1.5rem, 5vw, 5rem)',
+                willChange: 'transform',
+              }}
+            >
+              {projects.map((p, i) => (
+                <ProjectCard
+                  key={i}
+                  project={p}
+                  index={i}
+                  accentColor={ACCENTS[i % ACCENTS.length]}
+                  onClick={() => setActiveModal(i)}
+                />
+              ))}
+
+              {/* End card — CTA */}
+              <div style={{
+                width: 'clamp(240px, 28vw, 340px)',
+                flexShrink: 0,
+                border: '1px solid var(--border)',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: '1.5rem', padding: '2.5rem',
+                background: 'var(--lime-03)',
+              }}>
+                <div style={{ fontFamily: 'var(--display)', fontSize: '3rem', color: 'var(--lime)', lineHeight: 1, letterSpacing: '0.04em', textAlign: 'center' }}>
+                  MORE ON<br/>GITHUB
                 </div>
-                {/* Technologies */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="space-y-2 sm:space-y-4"
+                <p style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--white-40)', letterSpacing: '0.1em', textAlign: 'center', lineHeight: 1.7 }}>
+                  {projects.length} projects and counting
+                </p>
+                <a
+                  href="https://github.com/thomasukutty07"
+                  target="_blank" rel="noopener noreferrer"
+                  className="btn-lime"
+                  style={{ textDecoration: 'none', fontSize: '0.68rem' }}
                 >
-                  <div className="text-xs sm:text-sm text-gray-500 uppercase tracking-wider">Technologies</div>
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
-                    {project.technologies.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-2 sm:px-4 py-1 sm:py-2 bg-[#1A1A1A] text-xs sm:text-sm text-gray-300 border border-[#2D2D2D] hover:border-[#FF3366] hover:text-[#FF3366] transition-all duration-300"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-                {/* Action Buttons */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-col sm:flex-row gap-4 sm:gap-6 pt-2 sm:pt-4"
-                >
-                  <motion.a
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    href="https://github.com/thomasukutty07"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 sm:px-8 py-2 sm:py-4 bg-transparent text-white border border-[#2D2D2D] hover:border-[#FF3366] hover:text-[#FF3366] transition-all duration-300 flex items-center gap-2 sm:gap-3 text-sm sm:text-base"
-                  >
-                    <FaGithub className="text-lg sm:text-xl" />
-                    <span>View Code</span>
-                  </motion.a>
-                  <motion.a
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    href={project.liveLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 sm:px-8 py-2 sm:py-4 bg-[#FF3366] text-white hover:bg-[#FF3366]/90 transition-all duration-300 flex items-center gap-2 sm:gap-3 text-sm sm:text-base"
-                  >
-                    <svg className="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    <span>Live Demo</span>
-                  </motion.a>
-                </motion.div>
+                  <FaGithub /> View Profile ↗
+                </a>
               </div>
             </div>
-            {/* Separator */}
-            {index < projects.length - 1 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="w-full h-px bg-gradient-to-r from-transparent via-[#2D2D2D] to-transparent mt-12 sm:mt-24"
-              ></motion.div>
-            )}
-          </motion.div>
-        ))}
-      </div>
-      {/* Featured Project, Stats, and CTA sections can be added here as in App.jsx if needed */}
-    </div>
-  </section>
-);
+          </div>
 
-export default ProjectsSection; 
+          {/* Card counter */}
+          <div style={{
+            position: 'absolute', bottom: '1.8rem', right: '2.5rem',
+            fontFamily: 'var(--mono)', fontSize: '0.55rem',
+            color: 'var(--white-20)', letterSpacing: '0.14em',
+          }}>
+            {projects.length} PROJECTS
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

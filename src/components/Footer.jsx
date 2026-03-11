@@ -1,11 +1,30 @@
-import React from "react";
+import React from 'react';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
-const Footer = () => (
-  <footer className="bg-[#0A0A0A] text-gray-400 py-8 border-t border-[#2D2D2D]">
-    <div className="container mx-auto px-4 text-center">
-      <p>&copy; {new Date().getFullYear()} Thomasukutty Reji. All rights reserved.</p>
-    </div>
-  </footer>
-);
-
-export default Footer; 
+export default function Footer() {
+  const year = new Date().getFullYear();
+  return (
+    <footer className="footer">
+      <div className="wrap">
+        <div className="footer-inner">
+          <div>
+            <p className="footer-copy">
+              © {year} <span>Thomasukutty Reji</span> · Built with React + Three.js + GSAP
+            </p>
+          </div>
+          <div className="footer-links">
+            <a href="https://github.com/thomasukutty07" target="_blank" rel="noopener noreferrer" className="f-link">
+              GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/thomasukutty-reji-431b9027b/" target="_blank" rel="noopener noreferrer" className="f-link">
+              LinkedIn
+            </a>
+            <a href="mailto:thomasmern007@gmail.com" className="f-link">
+              Email
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
