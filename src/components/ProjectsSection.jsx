@@ -1,58 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap }          from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaExternalLinkAlt, FaGithub, FaTimes } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─────────────────── MODAL ─────────────────── */
-const Modal = ({ project, onClose }) => {
-  const backdropRef = useRef();
-  const boxRef      = useRef();
-
-  useEffect(() => {
-    const handleKey = (e) => { if (e.key === 'Escape') close(); };
-    document.addEventListener('keydown', handleKey);
-    document.body.style.overflow = 'hidden';
-    return () => { document.removeEventListener('keydown', handleKey); document.body.style.overflow = ''; };
-  }, []);
-
-  const close = () => {
-    gsap.to(boxRef.current,      { opacity: 0, y: 24, duration: 0.28, ease: 'power3.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.35, onComplete: onClose });
-  };
-
-  return (
-    <div ref={backdropRef} className="modal-backdrop"
-      onClick={e => { if (e.target === backdropRef.current) close(); }}
-    >
-      <div ref={boxRef} className="modal" style={{ position: 'relative' }}>
-        <button className="modal-close" onClick={close}><FaTimes /></button>
-        <img src={project.image} alt={project.title} className="modal-img" />
-        <div className="modal-body">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
-            {project.technologies.map(t => (
-              <span key={t} style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', padding: '0.15rem 0.6rem', border: '1px solid rgba(163,255,71,0.3)', color: 'var(--lime)', background: 'rgba(163,255,71,0.06)', letterSpacing: '0.06em' }}>{t}</span>
-            ))}
-          </div>
-          <h3 style={{ fontFamily: 'var(--display)', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', color: 'var(--white)', letterSpacing: '0.04em', marginBottom: '0.8rem', lineHeight: 1.1 }}>{project.title}</h3>
-          <p style={{ color: 'var(--white-60)', lineHeight: 1.85, fontSize: '0.9rem', marginBottom: '2rem' }}>{project.description}</p>
-          <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
-            <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn-lime" style={{ textDecoration: 'none', padding: '0.75rem 1.5rem', fontSize: '0.7rem' }}>
-              <FaExternalLinkAlt style={{ fontSize: '0.65rem' }} /> Live Demo
-            </a>
-            <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ textDecoration: 'none', padding: '0.75rem 1.5rem', fontSize: '0.7rem' }}>
-              <FaGithub /> Source Code
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 /* ─────────────────── HORIZONTAL PROJECT CARD ─────────────────── */
-const ProjectCard = ({ project, index, accentColor, onClick }) => {
+const ProjectCard = ({ project, index, accentColor }) => {
   const cardRef = useRef();
 
   const onEnter = () => {
@@ -65,9 +19,11 @@ const ProjectCard = ({ project, index, accentColor, onClick }) => {
   };
 
   return (
-    <div
+    <a
       ref={cardRef}
-      onClick={onClick}
+      href={project.liveLink}
+      target="_blank"
+      rel="noopener noreferrer"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       style={{
@@ -81,9 +37,8 @@ const ProjectCard = ({ project, index, accentColor, onClick }) => {
         transition: 'border-color 0.3s, box-shadow 0.3s',
         position: 'relative',
         overflow: 'hidden',
+        textDecoration: 'none',
       }}
-      onMouseEnter2={e => e.currentTarget.style.borderColor = accentColor + '55'}
-      onMouseLeave2={e => e.currentTarget.style.borderColor = 'var(--border)'}
     >
       {/* Image */}
       <div style={{ overflow: 'hidden', height: '240px', position: 'relative', flexShrink: 0 }}>
@@ -138,7 +93,11 @@ const ProjectCard = ({ project, index, accentColor, onClick }) => {
       <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
         {/* Category */}
         <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: accentColor, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-          Full Stack Project
+          {
+            ['HooBank', 'Baytebar', 'Edusity'].some(t => project.title.includes(t)) ? 'Static Website' :
+            project.title.includes('Cineflix') ? 'API Integrated' :
+            'Full Stack Project'
+          }
         </div>
 
         {/* Title */}
@@ -171,14 +130,12 @@ const ProjectCard = ({ project, index, accentColor, onClick }) => {
 
         {/* Links */}
         <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-          <a
-            href={project.liveLink} target="_blank" rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
+          <span
             className="btn-lime"
-            style={{ textDecoration: 'none', padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center', clipPath: 'none' }}
+            style={{ padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center', clipPath: 'none' }}
           >
             <FaExternalLinkAlt style={{ fontSize: '0.6rem' }} /> Visit
-          </a>
+          </span>
           <a
             href={project.githubLink} target="_blank" rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
@@ -189,17 +146,16 @@ const ProjectCard = ({ project, index, accentColor, onClick }) => {
           </a>
         </div>
       </div>
-    </div>
+    </a>
   );
 };
 
 /* ─────────────────── MAIN SECTION ─────────────────── */
 export default function ProjectsSection({ projects }) {
-  const outerRef  = useRef(null);   // pinned wrapper
-  const stickyRef = useRef(null);   // sticky viewport
-  const railRef   = useRef(null);   // sliding rail
+  const outerRef  = useRef(null);
+  const stickyRef = useRef(null);
+  const railRef   = useRef(null);
   const headerRef = useRef(null);
-  const [activeModal, setActiveModal] = useState(null);
 
   const ACCENTS = ['#A3FF47', '#FF4D6D', '#4DFFEA', '#F59E0B', '#A78BFA', '#EC4899', '#38BDF8'];
 
@@ -247,10 +203,6 @@ export default function ProjectsSection({ projects }) {
 
   return (
     <section id="projects">
-      {activeModal !== null && (
-        <Modal project={projects[activeModal]} onClose={() => setActiveModal(null)} />
-      )}
-
       {/* ── Pinned horizontal scroll container ── */}
       <div ref={outerRef} style={{ background: 'var(--black2)' }}>
         <div
@@ -341,7 +293,6 @@ export default function ProjectsSection({ projects }) {
                   project={p}
                   index={i}
                   accentColor={ACCENTS[i % ACCENTS.length]}
-                  onClick={() => setActiveModal(i)}
                 />
               ))}
 

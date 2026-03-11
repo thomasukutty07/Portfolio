@@ -243,7 +243,7 @@ body {
 .hero {
   min-height: 100vh; position: relative;
   display: flex; flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   background:
     radial-gradient(ellipse 70% 60% at 15% 30%, rgba(163,255,71,0.07) 0%, transparent 70%),
     radial-gradient(ellipse 50% 40% at 85% 80%, rgba(56,190,255,0.04) 0%, transparent 60%),
@@ -251,6 +251,7 @@ body {
 }
 .hero-canvas {
   position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
 }
 .hero-grid-overlay {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -265,6 +266,7 @@ body {
   padding: 0 2.5rem 5rem;
   max-width: 1360px; margin: 0 auto; width: 100%;
   padding-top: 9rem;
+  overflow: visible;
 }
 .hero-eyebrow {
   font-family: var(--mono); font-size: 0.65rem;

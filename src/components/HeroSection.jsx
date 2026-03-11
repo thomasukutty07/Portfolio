@@ -16,7 +16,7 @@ const ROLES = [
   'UI/UX Architect',
 ];
 
-
+const NAME_LETTERS = 'THOMASUKUTTY'.split('');
 
 export default function HeroSection({ scrollToSection }) {
   const [roleIdx, setRoleIdx]     = useState(0);
@@ -24,10 +24,11 @@ export default function HeroSection({ scrollToSection }) {
   const [typing,  setTyping]      = useState(true);
   const [canvas3dReady, set3dReady] = useState(false);
 
-  const sectionRef = useRef(null);
-  const headRef    = useRef(null);
-  const metaRef    = useRef(null);
-  const canvasRef  = useRef(null);
+  const sectionRef  = useRef(null);
+  const headRef     = useRef(null);
+  const lettersRef  = useRef(null);   // container for THOMASUKUTTY letters
+  const metaRef     = useRef(null);
+  const canvasRef   = useRef(null);
 
   /* Typewriter */
   useEffect(() => {
@@ -51,31 +52,56 @@ export default function HeroSection({ scrollToSection }) {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  /* GSAP entrance */
+  /* GSAP entrance + scroll-driven letter fall */
   useEffect(() => {
-    if (!headRef.current) return;
+    if (!headRef.current || !lettersRef.current) return;
 
-    const lines = Array.from(headRef.current.querySelectorAll('.h-line'));
-    gsap.set(lines, { y: '110%', opacity: 0 });
-    gsap.set(metaRef.current, { opacity: 0, y: 30 });
+    const lines   = Array.from(headRef.current.querySelectorAll('.h-line'));
+    const letters = Array.from(lettersRef.current.querySelectorAll('.hero-letter'));
+
+    /* ── Entrance animation ── */
+    gsap.set(letters, { y: 0, opacity: 1 });
+    gsap.set(lines,   { y: '110%', opacity: 0 });
+    gsap.set(metaRef.current,   { opacity: 0, y: 30 });
     gsap.set(canvasRef.current, { opacity: 0, scale: 0.6 });
 
-    const tl = gsap.timeline({ delay: 0.35 });
-    tl
-      .to(lines, { y: '0%', opacity: 1, duration: 1.1, ease: 'power4.out', stagger: 0.08 })
-      .to(metaRef.current, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
-      .to(canvasRef.current, { opacity: 1, scale: 1, duration: 1.6, ease: 'power4.out' }, 0.2);
+    gsap.timeline({ delay: 0.35 })
+      .to(lines,  { y: '0%', opacity: 1, duration: 1.1, ease: 'power4.out', stagger: 0.08 })
+      .to(metaRef.current,  { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
+      .to(canvasRef.current,{ opacity: 1, scale: 1, duration: 1.6, ease: 'power4.out' }, 0.2);
 
-    /* Scroll parallax */
+    /* ── Canvas parallax ── */
     gsap.to(canvasRef.current, {
       y: 120,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 2 }
+      scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 2 },
     });
-    gsap.to(headRef.current, {
-      y: -60, opacity: 0,
-      scrollTrigger: { trigger: sectionRef.current, start: '40% top', end: 'bottom top', scrub: 1.2 }
+
+    /* ── RAINDROP FALL ─────────────────────────────────────────────
+       Single timeline driven by one ScrollTrigger.
+       Starts when hero bottom is near the top (just finished scrolling past hero).
+       Short end window = fast, snappy fall clearly visible.
+       scrub: 1 makes it fully reversible on scroll-up.
+    ──────────────────────────────────────────────────────────────── */
+    const fallTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'bottom 95%',   // fires right as hero bottom approaches viewport top
+        end:   'bottom 20%',   // completes fast — snappy raindrop feel
+        scrub: 1,
+        invalidateOnRefresh: true,
+      },
     });
+
+    fallTl.to(letters, {
+      y: 500,                  // 500px straight down — shoots below the hero clearly
+      opacity: 0,
+      ease: 'power3.in',       // gravity: slow at top, fast at bottom
+      stagger: 0.05,           // each letter starts 5% later — cascade / rain effect
+    });
+
+    return () => ScrollTrigger.getAll().forEach(t => t.kill());
   }, []);
+
 
   const socials = [
     { href: 'https://github.com/thomasukutty07',                        icon: FaGithub,   label: 'GitHub' },
@@ -111,23 +137,43 @@ export default function HeroSection({ scrollToSection }) {
           Available for work · Based in India
         </div>
 
-        {/* Giant headline — single row THOMASUKUTTY */}
+        {/* Headline */}
         <div ref={headRef}>
-          {/* Full name in one row */}
-          <div style={{ overflow: 'hidden' }}>
-            <div
-              className="h-line hero-headline"
-              style={{
-                fontSize: 'clamp(2.8rem, 7.5vw, 9.5rem)',
-                whiteSpace: 'nowrap',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              THOMASUKUTTY
-            </div>
+
+          {/* ── THOMASUKUTTY — individual falling letters ── */}
+          <div
+            ref={lettersRef}
+            style={{
+              overflow: 'visible',          /* allow letters to fall outside clip */
+              display: 'flex',
+              flexWrap: 'nowrap',
+              alignItems: 'baseline',
+              gap: 0,
+              lineHeight: 0.92,
+            }}
+          >
+            {NAME_LETTERS.map((letter, i) => (
+              <span
+                key={i}
+                className="hero-letter"
+                style={{
+                  display: 'inline-block',
+                  fontFamily: 'var(--display)',
+                  fontSize: 'clamp(2.8rem, 7.5vw, 9.5rem)',
+                  letterSpacing: '-0.01em',
+                  color: 'var(--white)',
+                  transformOrigin: 'center bottom',
+                  willChange: 'transform, opacity',
+                  /* Space between letters preserved */
+                  marginRight: letter === ' ' ? '0.25em' : '0',
+                }}
+              >
+                {letter}
+              </span>
+            ))}
           </div>
 
-          {/* Subtitle: REJI in outline accent style */}
+          {/* REJI subtitle — slides in from entrance, NOT part of fall */}
           <div style={{ overflow: 'hidden', marginTop: '0.1em' }}>
             <div
               className="h-line"
