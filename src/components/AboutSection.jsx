@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { gsap }          from 'gsap';
+import { useGSAP }       from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 
@@ -197,79 +198,101 @@ export default function AboutSection() {
     return () => obs.disconnect();
   }, []);
 
-  useEffect(() => {
+  useGSAP(() => {
     if (!sectionRef.current) return;
-    const triggers = [];
 
-    /* ── Headline: words clip-path reveal ── */
-    if (headRef.current) {
-      const words = headRef.current.querySelectorAll('.h-word');
-      gsap.set(words, { y: '105%', opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: headRef.current, start: 'top 85%', once: true,
-        onEnter: () => gsap.to(words, { y: '0%', opacity: 1, duration: 1, ease: 'power4.out', stagger: 0.08 }),
-      }));
+    /* ── Select Elements ── */
+    const words  = headRef.current ? Array.from(headRef.current.querySelectorAll('.h-word')) : [];
+    const bars   = Array.from(sectionRef.current.querySelectorAll('.a-bar'));
+    const tlItems = timelineRef.current ? Array.from(timelineRef.current.querySelectorAll('.tl-item')) : [];
+
+    /* ── Initial Starting States ── */
+    gsap.set(words, { y: '105%', opacity: 0 });
+    gsap.set(bars,  { scaleX: 0 });
+    gsap.set(tlItems, { x: 30, opacity: 0 });
+
+    if (col1Ref.current && col2Ref.current && col3Ref.current) {
+      gsap.set(col1Ref.current, { x: '-100vw', opacity: 0 });
+      gsap.set(col2Ref.current, { y: '150vh', opacity: 0 });
+      gsap.set(col3Ref.current, { x: '100vw', opacity: 0 });
     }
 
-    /* ── Col 1: slide from left ── */
-    if (col1Ref.current) {
-      gsap.set(col1Ref.current, { x: -60, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: col1Ref.current, start: 'top 82%', once: true,
-        onEnter: () => gsap.to(col1Ref.current, { x: 0, opacity: 1, duration: 1, ease: 'power4.out' }),
-      }));
-    }
+    /* ── Stateless Animation Sequences (Bulletproof against React re-renders) ── */
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top 50%', // Re-configured to trigger when the top of the section reaches exactly 50% of the viewport height
+      end: 'bottom 15%',
+      invalidateOnRefresh: true,
 
-    /* ── Col 2 (canvas+stats): slide from below ── */
-    if (col2Ref.current) {
-      gsap.set(col2Ref.current, { y: 80, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: col2Ref.current, start: 'top 85%', once: true,
-        onEnter: () => {
-          gsap.to(col2Ref.current, { y: 0, opacity: 1, duration: 1.1, ease: 'power4.out', delay: 0.12 });
-          /* Count-up animation */
-          STATS.forEach((s, i) => {
-            if (typeof s.num !== 'number') return;
+      onEnter: () => {
+        // Play forward
+        if (words.length) gsap.to(words, { y: '0%', opacity: 1, duration: 1, ease: 'power4.out', stagger: 0.08, overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.12, overwrite: 'auto' });
+        if (tlItems.length) gsap.to(tlItems, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.15, overwrite: 'auto' });
+        
+        if (col1Ref.current) {
+          gsap.to(col1Ref.current, { x: 0, opacity: 1, duration: 1.2, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col2Ref.current, { y: 0, opacity: 1, duration: 1.1, ease: 'power4.out', delay: 0.1, overwrite: 'auto' });
+          gsap.to(col3Ref.current, { x: 0, opacity: 1, duration: 1.2, ease: 'power4.out', delay: 0.2, overwrite: 'auto' });
+        }
+
+        // Stats Count
+        STATS.forEach((s, i) => {
+          if (typeof s.num === 'number') {
             gsap.fromTo({ val: 0 }, { val: 0 }, {
-              val: s.num, duration: 1.6, ease: 'power2.out', delay: 0.4 + i * 0.12,
+              val: s.num, duration: 1.6, ease: 'power2.out', delay: 0.4 + i * 0.12, overwrite: 'auto',
               onUpdate() { setCounts(c => { const n = [...c]; n[i] = Math.round(this.targets()[0].val); return n; }); },
             });
-          });
-        },
-      }));
-    }
+          }
+        });
+      },
 
-    /* ── Col 3: slide from right ── */
-    if (col3Ref.current) {
-      gsap.set(col3Ref.current, { x: 60, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: col3Ref.current, start: 'top 82%', once: true,
-        onEnter: () => gsap.to(col3Ref.current, { x: 0, opacity: 1, duration: 1, ease: 'power4.out', delay: 0.2 }),
-      }));
-    }
+      onLeave: () => {
+        // Hide outward (scrolled too far down)
+        if (words.length) gsap.to(words, { y: '-105%', opacity: 0, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 0, duration: 0.8, ease: 'power3.out', overwrite: 'auto' });
+        if (tlItems.length) gsap.to(tlItems, { x: 30, opacity: 0, duration: 0.6, ease: 'power3.out', overwrite: 'auto' });
 
-    /* ── Skill bars fill ── */
-    triggers.push(ScrollTrigger.create({
-      trigger: sectionRef.current, start: 'top 70%', once: true,
-      onEnter: () => gsap.to('.a-bar', { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.12 }),
-    }));
+        if (col1Ref.current) {
+          gsap.to(col1Ref.current, { x: '-100vw', opacity: 0, duration: 1, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col2Ref.current, { y: '150vh', opacity: 0, duration: 1, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col3Ref.current, { x: '100vw', opacity: 0, duration: 1, ease: 'power4.out', overwrite: 'auto' });
+        }
+      },
 
-    /* ── Timeline cascade ── */
-    if (timelineRef.current) {
-      const items = timelineRef.current.querySelectorAll('.tl-item');
-      gsap.set(items, { x: 30, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: timelineRef.current, start: 'top 88%', once: true,
-        onEnter: () => gsap.to(items, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.15 }),
-      }));
-    }
+      onEnterBack: () => {
+        // Re-enter from bottom (scrolled back up into view)
+        if (words.length) gsap.to(words, { y: '0%', opacity: 1, duration: 1, ease: 'power4.out', stagger: 0.08, overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.12, overwrite: 'auto' });
+        if (tlItems.length) gsap.to(tlItems, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.15, overwrite: 'auto' });
 
-    return () => triggers.forEach(t => t.kill());
-  }, []);
+        if (col1Ref.current) {
+          gsap.to(col1Ref.current, { x: 0, opacity: 1, duration: 1.2, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col2Ref.current, { y: 0, opacity: 1, duration: 1.1, ease: 'power4.out', delay: 0.1, overwrite: 'auto' });
+          gsap.to(col3Ref.current, { x: 0, opacity: 1, duration: 1.2, ease: 'power4.out', delay: 0.2, overwrite: 'auto' });
+        }
+      },
+
+      onLeaveBack: () => {
+        // Reset and hide cleanly (scrolled perfectly back to the top of the page)
+        if (words.length) gsap.to(words, { y: '105%', opacity: 0, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 0, duration: 0.8, ease: 'power3.out', overwrite: 'auto' });
+        if (tlItems.length) gsap.to(tlItems, { x: 30, opacity: 0, duration: 0.6, ease: 'power3.out', overwrite: 'auto' });
+        setCounts(STATS.map(() => 0));
+
+        if (col1Ref.current) {
+          gsap.to(col1Ref.current, { x: '-100vw', opacity: 0, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col2Ref.current, { y: '150vh', opacity: 0, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
+          gsap.to(col3Ref.current, { x: '100vw', opacity: 0, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
+        }
+      }
+    });
+
+  }, { scope: sectionRef });
 
   return (
     <section id="about" ref={sectionRef} className="about">
-      <div className="wrap">
+      <div className="wrap" style={{ overflowX: 'hidden' }}>
         {/* Header — word-by-word clip reveal */}
         <div ref={headRef} style={{ marginBottom: '4rem', overflow: 'hidden' }}>
           <div className="sec-label" style={{ marginBottom: '1.5rem' }}>About</div>

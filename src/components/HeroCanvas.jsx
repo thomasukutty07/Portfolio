@@ -8,39 +8,79 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { MeshDistortMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ─── Wireframe torus knot ─── */
-const WireKnot = () => {
-  const knotRef = useRef();
-  const rimRef  = useRef();
-  const icos    = useRef();
+/* ─── Cybernetic Data Swarm ─── */
+const DataSwarm = () => {
+  const coreRef = useRef();
+  const swarmRef = useRef();
+
+  // Pre-calculate positions, rotations, and scales for the orbiting data cubes
+  const cubes = useMemo(() => {
+    return Array.from({ length: 45 }).map(() => {
+      // Create a spherical distribution for the swarm
+      const radius = 1.8 + Math.random() * 1.5;
+      const theta  = Math.random() * 2 * Math.PI;
+      const phi    = Math.acos((Math.random() * 2) - 1);
+      
+      return {
+        position: [
+          radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.sin(phi) * Math.sin(theta),
+          radius * Math.cos(phi)
+        ],
+        rotation: [Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI],
+        scale: Math.random() * 0.12 + 0.04,
+        emissiveSpeed: Math.random() * 2 + 1,
+      };
+    });
+  }, []);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-    if (knotRef.current) { knotRef.current.rotation.x = t * 0.11; knotRef.current.rotation.y = t * 0.17; }
-    if (rimRef.current)  { rimRef.current.rotation.x = -t * 0.08; rimRef.current.rotation.z  = t * 0.12; }
-    if (icos.current)    { icos.current.rotation.y = t * 0.22;    icos.current.rotation.x    = t * 0.14; }
+    if (coreRef.current) {
+      coreRef.current.rotation.x = t * 0.2;
+      coreRef.current.rotation.y = t * 0.3;
+    }
+    if (swarmRef.current) {
+      swarmRef.current.rotation.y = t * 0.12;
+      swarmRef.current.rotation.z = Math.sin(t * 0.1) * 0.2;
+      
+      // Make the data cubes gently pulse their glow
+      const children = swarmRef.current.children;
+      for (let i = 0; i < children.length; i++) {
+        children[i].rotation.x += 0.01;
+        children[i].rotation.y += 0.015;
+      }
+    }
   });
 
   return (
-    <Float speed={0.9} rotationIntensity={0.14} floatIntensity={0.4}>
-      <mesh ref={knotRef}>
-        <torusKnotGeometry args={[1.4, 0.38, 100, 20, 2, 3]} />
-        <meshStandardMaterial
-          color="#A3FF47" emissive="#3A6600" emissiveIntensity={0.45}
-          roughness={0.12} metalness={0.95} transparent opacity={0.9}
-        />
-      </mesh>
-      <mesh ref={rimRef} scale={1.015}>
-        <torusKnotGeometry args={[1.4, 0.38, 60, 12, 2, 3]} />
-        <meshBasicMaterial color="#A3FF47" wireframe transparent opacity={0.15} />
-      </mesh>
-      <mesh ref={icos}>
-        <icosahedronGeometry args={[0.7, 1]} />
-        <MeshDistortMaterial
-          color="#050505" emissive="#A3FF47" emissiveIntensity={0.2}
-          distort={0.28} speed={1.5} roughness={0.04} metalness={1}
-        />
-      </mesh>
+    <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.6}>
+      <group>
+        {/* Outer glowing containment sphere */}
+        <mesh ref={coreRef} scale={1.3}>
+          <icosahedronGeometry args={[1, 2]} />
+          <meshStandardMaterial 
+            color="#0C0C0A" emissive="#A3FF47" emissiveIntensity={0.15}
+            wireframe transparent opacity={0.3}
+          />
+        </mesh>
+        {/* Orbiting Data Blocks */}
+        <group ref={swarmRef}>
+          {cubes.map((cube, i) => (
+            <mesh key={i} position={cube.position} rotation={cube.rotation} scale={cube.scale}>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshStandardMaterial 
+                color="#0C0C0A" 
+                emissive="#A3FF47"
+                emissiveIntensity={0.3}
+                wireframe={i % 3 === 0} // 1 in 3 cubes are wireframe
+                metalness={0.8}
+                roughness={0.2}
+              />
+            </mesh>
+          ))}
+        </group>
+      </group>
     </Float>
   );
 };
@@ -98,7 +138,7 @@ export default function HeroCanvas() {
       <ambientLight intensity={0.4} />
       <pointLight position={[5, 5, 5]}  intensity={7}   color="#A3FF47" />
       <pointLight position={[-5,-5,-3]} intensity={2.5} color="#4DFFEA" />
-      <WireKnot />
+      <DataSwarm />
       <BgParticles />
     </Canvas>
   );

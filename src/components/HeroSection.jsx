@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { gsap }          from 'gsap';
+import { useGSAP }       from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
@@ -53,7 +54,7 @@ export default function HeroSection({ scrollToSection }) {
   }, []);
 
   /* GSAP entrance + scroll-driven letter fall */
-  useEffect(() => {
+  useGSAP(() => {
     if (!headRef.current || !lettersRef.current) return;
 
     const lines   = Array.from(headRef.current.querySelectorAll('.h-line'));
@@ -63,44 +64,74 @@ export default function HeroSection({ scrollToSection }) {
     gsap.set(letters, { y: 0, opacity: 1 });
     gsap.set(lines,   { y: '110%', opacity: 0 });
     gsap.set(metaRef.current,   { opacity: 0, y: 30 });
-    gsap.set(canvasRef.current, { opacity: 0, scale: 0.6 });
+    gsap.set(canvasRef.current, { opacity: 0 });
 
     gsap.timeline({ delay: 0.35 })
       .to(lines,  { y: '0%', opacity: 1, duration: 1.1, ease: 'power4.out', stagger: 0.08 })
       .to(metaRef.current,  { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
-      .to(canvasRef.current,{ opacity: 1, scale: 1, duration: 1.6, ease: 'power4.out' }, 0.2);
-
-    /* ── Canvas parallax ── */
-    gsap.to(canvasRef.current, {
-      y: 120,
-      scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 2 },
-    });
+      .to(canvasRef.current,{ opacity: 1, duration: 1.6, ease: 'power4.out' }, 0.2);
 
     /* ── RAINDROP FALL ─────────────────────────────────────────────
-       Single timeline driven by one ScrollTrigger.
-       Starts when hero bottom is near the top (just finished scrolling past hero).
-       Short end window = fast, snappy fall clearly visible.
-       scrub: 1 makes it fully reversible on scroll-up.
+       Plays an animation immediately when user scrolls just 5px down.
+       We separate timeline creation and ScrollTrigger to ensure it reverses flawlessly.
     ──────────────────────────────────────────────────────────────── */
-    const fallTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'bottom 95%',   // fires right as hero bottom approaches viewport top
-        end:   'bottom 20%',   // completes fast — snappy raindrop feel
-        scrub: 1,
-        invalidateOnRefresh: true,
+    const fallItems = Array.from(sectionRef.current.querySelectorAll('.fall-item'));
+    fallItems.push(canvasRef.current); // Make the 3D element also drop down with the text
+
+    /* ── RAINDROP FALL (STATELESS) ─────────────────────────────────────────────
+       By using stateless gsap.to() instead of a timeline, we guarantee the items
+       always animate from their exact current position. This completely fixes bugs
+       where elements remain invisible if you scroll backwards rapidly.
+    ───────────────────────────────────────────────────────────────────────── */
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: '5px top',
+      end: '70% top', // triggers reverse animation earlier when you scroll up past 70% of the Hero section
+      invalidateOnRefresh: true,
+      onEnter: () => {
+        // Scrolled down -> items fall away randomly
+        gsap.to(fallItems, {
+          y: 700,
+          opacity: 0,
+          duration: 0.45,
+          ease: 'power2.in',
+          stagger: { amount: 0.25, from: 'random' },
+          overwrite: true
+        });
       },
+      onLeave: () => {
+        // Ensures items stay completely fallen if user scrolled extremely fast past the boundary
+        gsap.to(fallItems, {
+          y: 700,
+          opacity: 0,
+          duration: 0.45,
+          ease: 'power2.in',
+          stagger: { amount: 0.25, from: 'random' },
+          overwrite: true
+        });
+      },
+      onEnterBack: () => {
+        // Scrolled UP immediately from underneath the hero section -> text reassembles
+        gsap.to(fallItems, {
+          y: 0,
+          opacity: 1,
+          duration: 0.45,
+          ease: 'power2.out',
+          stagger: { amount: 0.25, from: 'random' },
+          overwrite: true
+        });
+      },
+      onLeaveBack: () => {
+        // Scrolled perfectly to the absolute top of the page -> snap securely into place
+        gsap.to(fallItems, { 
+          y: 0, 
+          opacity: 1, 
+          duration: 0.2, 
+          overwrite: true 
+        });
+      }
     });
-
-    fallTl.to(letters, {
-      y: 500,                  // 500px straight down — shoots below the hero clearly
-      opacity: 0,
-      ease: 'power3.in',       // gravity: slow at top, fast at bottom
-      stagger: 0.05,           // each letter starts 5% later — cascade / rain effect
-    });
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
-  }, []);
+  }, { scope: sectionRef });
 
 
   const socials = [
@@ -132,7 +163,7 @@ export default function HeroSection({ scrollToSection }) {
       {/* Content */}
       <div className="hero-content">
         {/* Eyebrow */}
-        <div className="hero-eyebrow">
+        <div className="hero-eyebrow fall-item">
           <span className="hero-eyebrow-dot" />
           Available for work · Based in India
         </div>
@@ -155,7 +186,7 @@ export default function HeroSection({ scrollToSection }) {
             {NAME_LETTERS.map((letter, i) => (
               <span
                 key={i}
-                className="hero-letter"
+                className="hero-letter fall-item"
                 style={{
                   display: 'inline-block',
                   fontFamily: 'var(--display)',
@@ -174,7 +205,7 @@ export default function HeroSection({ scrollToSection }) {
           </div>
 
           {/* REJI subtitle — slides in from entrance, NOT part of fall */}
-          <div style={{ overflow: 'hidden', marginTop: '0.1em' }}>
+          <div className="fall-item" style={{ overflow: 'hidden', marginTop: '0.1em' }}>
             <div
               className="h-line"
               style={{
@@ -192,7 +223,7 @@ export default function HeroSection({ scrollToSection }) {
           </div>
 
           {/* Typewriter role */}
-          <div style={{
+          <div className="fall-item" style={{
             fontFamily: 'var(--mono)', fontSize: 'clamp(0.72rem, 1.4vw, 0.88rem)',
             color: 'var(--lime)', letterSpacing: '0.18em', textTransform: 'uppercase',
             marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem',
@@ -205,15 +236,15 @@ export default function HeroSection({ scrollToSection }) {
 
         {/* Meta row */}
         <div ref={metaRef} className="hero-meta">
-          <p className="hero-desc">
+          <p className="hero-desc fall-item">
             I craft full-stack digital experiences — scalable MERN applications, immersive 3D interfaces, and motion-rich UIs that ship fast and perform at scale.
           </p>
           <div className="hero-ctas">
-            <button className="btn-lime" onClick={() => scrollToSection('projects')}>
+            <button className="btn-lime fall-item" onClick={() => scrollToSection('projects')}>
               View Work
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <button className="btn-ghost" onClick={() => scrollToSection('contact')}>
+            <button className="btn-ghost fall-item" onClick={() => scrollToSection('contact')}>
               Get in Touch
             </button>
           </div>
@@ -223,14 +254,14 @@ export default function HeroSection({ scrollToSection }) {
       {/* Social strip */}
       <div className="hero-socials">
         {socials.map(({ href, icon: Icon, label }) => (
-          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="hero-social-link">
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="hero-social-link fall-item">
             <Icon /> {label}
           </a>
         ))}
-        <div style={{ height: 1, flex: 1, background: 'var(--border)', marginLeft: 'auto' }} />
+        <div className="fall-item" style={{ height: 1, flex: 1, background: 'var(--border)', marginLeft: 'auto' }} />
         {/* Mini stats */}
         {[['7+','Projects'], ['2+','Years'], ['15+','Tech']].map(([n, l]) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
+          <div key={l} className="fall-item" style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
             <span style={{ fontFamily: 'var(--display)', fontSize: '1.4rem', color: 'var(--lime)', lineHeight: 1 }}>{n}</span>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.56rem', color: 'var(--white-40)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{l}</span>
           </div>
@@ -238,7 +269,7 @@ export default function HeroSection({ scrollToSection }) {
       </div>
 
       {/* Scroll hint */}
-      <div className="hero-scroll-hint" onClick={() => scrollToSection('about')}>
+      <div className="hero-scroll-hint fall-item" onClick={() => scrollToSection('about')}>
         <div className="hero-scroll-line" />
         <span className="hero-scroll-label">Scroll</span>
       </div>

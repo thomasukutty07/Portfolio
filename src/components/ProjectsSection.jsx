@@ -19,11 +19,9 @@ const ProjectCard = ({ project, index, accentColor }) => {
   };
 
   return (
-    <a
+    <div
       ref={cardRef}
-      href={project.liveLink}
-      target="_blank"
-      rel="noopener noreferrer"
+      onClick={() => window.open(project.liveLink, '_blank')}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       style={{
@@ -130,12 +128,16 @@ const ProjectCard = ({ project, index, accentColor }) => {
 
         {/* Links */}
         <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-          <span
+          <a
+            href={project.liveLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
             className="btn-lime"
-            style={{ padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center', clipPath: 'none' }}
+            style={{ textDecoration: 'none', padding: '0.55rem 1.1rem', fontSize: '0.65rem', flex: 1, justifyContent: 'center', clipPath: 'none' }}
           >
             <FaExternalLinkAlt style={{ fontSize: '0.6rem' }} /> Visit
-          </span>
+          </a>
           <a
             href={project.githubLink} target="_blank" rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
@@ -146,7 +148,7 @@ const ProjectCard = ({ project, index, accentColor }) => {
           </a>
         </div>
       </div>
-    </a>
+    </div>
   );
 };
 

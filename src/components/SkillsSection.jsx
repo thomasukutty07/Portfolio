@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { gsap }          from 'gsap';
+import { useGSAP }       from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -63,75 +64,78 @@ const SkillsCanvas = () => (
   </Canvas>
 );
 
-export default function SkillsSection({ allSkills }) {
+export default function SkillsSection() {
   const sectionRef = useRef(null);
   const headRef    = useRef(null);
   const gridRef    = useRef(null);
   const [inView, setInView] = useState(false);
 
-  useEffect(() => {
+  useGSAP(() => {
     if (!sectionRef.current) return;
-    const triggers = [];
 
-    /* ── Headline: split into chars, clip-path reveal ── */
-    if (headRef.current) {
-      const title = headRef.current.querySelector('.skills-title');
-      if (title) {
-        const text  = title.textContent;
-        title.innerHTML = text.split('').map(ch =>
-          `<span class="s-char" style="display:inline-block;overflow:hidden"><span class="s-char-inner" style="display:inline-block">${ch === ' ' ? '&nbsp;' : ch}</span></span>`
-        ).join('');
-        const inners = title.querySelectorAll('.s-char-inner');
-        gsap.set(inners, { y: '110%' });
-        triggers.push(ScrollTrigger.create({
-          trigger: headRef.current, start: 'top 85%', once: true,
-          onEnter: () => gsap.to(inners, { y: '0%', duration: 0.9, ease: 'power4.out', stagger: 0.028 }),
-        }));
-      }
+    /* ── Selectors ── */
+    const title   = headRef.current?.querySelector('.skills-title');
+    const sub     = headRef.current?.querySelector('.skills-sub');
+    const boxes   = gridRef.current ? Array.from(gridRef.current.querySelectorAll('.sk-cat')) : [];
+    const pills   = gridRef.current ? Array.from(gridRef.current.querySelectorAll('.sk-pill')) : [];
+    const bars    = gridRef.current ? Array.from(gridRef.current.querySelectorAll('.s-bar')) : [];
 
-      /* Sub-label fade */
-      const sub = headRef.current.querySelector('.skills-sub');
-      if (sub) {
-        gsap.set(sub, { opacity: 0, y: 20 });
-        triggers.push(ScrollTrigger.create({
-          trigger: sub, start: 'top 88%', once: true,
-          onEnter: () => gsap.to(sub, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.5 }),
-        }));
-      }
+    /* ── Headline Split Setup (Safe) ── */
+    let inners = [];
+    if (title && !title.hasAttribute('data-split')) {
+      title.setAttribute('data-split', 'true');
+      const text = title.textContent;
+      title.innerHTML = text.split('').map(ch =>
+        `<span class="s-char" style="display:inline-block;overflow:hidden;vertical-align:bottom"><span class="s-char-inner" style="display:inline-block">${ch === ' ' ? '&nbsp;' : ch}</span></span>`
+      ).join('');
     }
+    if (title) inners = Array.from(title.querySelectorAll('.s-char-inner'));
 
-    /* ── Category boxes: slide up with stagger ── */
-    if (gridRef.current) {
-      const boxes = gridRef.current.querySelectorAll('.sk-cat');
-      gsap.set(boxes, { y: 60, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: gridRef.current, start: 'top 85%', once: true,
-        onEnter: () => gsap.to(boxes, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.12 }),
-      }));
+    /* ── Initial states ── */
+    gsap.set(inners, { y: '110%' });
+    if (sub) gsap.set(sub, { opacity: 0, y: 20 });
+    gsap.set(boxes, { y: 60, opacity: 0 });
+    gsap.set(pills, { scale: 0.5, opacity: 0 });
+    gsap.set(bars,  { scaleX: 0 });
 
-      /* ── Skill pills burst in ── */
-      const pills = gridRef.current.querySelectorAll('.sk-pill');
-      gsap.set(pills, { scale: 0.7, opacity: 0 });
-      triggers.push(ScrollTrigger.create({
-        trigger: gridRef.current, start: 'top 80%', once: true,
-        onEnter: () => gsap.to(pills, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.4)', stagger: 0.04 }),
-      }));
+    /* ── ScrollTrigger Stateless ── */
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top 65%',
+      end: 'bottom 15%',
+      invalidateOnRefresh: true,
+      onEnter: () => {
+        setInView(true);
+        if (inners.length) gsap.to(inners, { y: '0%', duration: 0.9, ease: 'power4.out', stagger: 0.02, overwrite: 'auto' });
+        if (sub) gsap.to(sub, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.3, overwrite: 'auto' });
+        if (boxes.length) gsap.to(boxes, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.1, delay: 0.2, overwrite: 'auto' });
+        if (pills.length) gsap.to(pills, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.4)', stagger: 0.03, delay: 0.4, overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.1, delay: 0.5, overwrite: 'auto' });
+      },
+      onLeave: () => {
+        if (inners.length) gsap.to(inners, { y: '-110%', duration: 0.6, ease: 'power3.in', overwrite: 'auto' });
+        if (sub) gsap.to(sub, { opacity: 0, y: -20, duration: 0.5, ease: 'power3.in', overwrite: 'auto' });
+        if (boxes.length) gsap.to(boxes, { y: -40, opacity: 0, duration: 0.6, ease: 'power3.in', stagger: 0.05, overwrite: 'auto' });
+        if (pills.length) gsap.to(pills, { scale: 0.8, opacity: 0, duration: 0.4, ease: 'power3.in', overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 0, duration: 0.6, ease: 'power3.in', overwrite: 'auto' });
+      },
+      onEnterBack: () => {
+        if (inners.length) gsap.to(inners, { y: '0%', duration: 0.9, ease: 'power4.out', stagger: 0.02, overwrite: 'auto' });
+        if (sub) gsap.to(sub, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.3, overwrite: 'auto' });
+        if (boxes.length) gsap.to(boxes, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.1, delay: 0.2, overwrite: 'auto' });
+        if (pills.length) gsap.to(pills, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.4)', stagger: 0.03, delay: 0.4, overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.1, delay: 0.5, overwrite: 'auto' });
+      },
+      onLeaveBack: () => {
+        if (inners.length) gsap.to(inners, { y: '110%', duration: 0.6, ease: 'power3.in', overwrite: 'auto' });
+        if (sub) gsap.to(sub, { opacity: 0, y: 20, duration: 0.5, ease: 'power3.in', overwrite: 'auto' });
+        if (boxes.length) gsap.to(boxes, { y: 60, opacity: 0, duration: 0.6, ease: 'power3.in', stagger: 0.05, overwrite: 'auto' });
+        if (pills.length) gsap.to(pills, { scale: 0.5, opacity: 0, duration: 0.4, ease: 'power3.in', overwrite: 'auto' });
+        if (bars.length) gsap.to(bars, { scaleX: 0, duration: 0.6, ease: 'power3.in', overwrite: 'auto' });
+      }
+    });
 
-      /* ── Proficiency bars sweep ── */
-      triggers.push(ScrollTrigger.create({
-        trigger: gridRef.current, start: 'top 75%', once: true,
-        onEnter: () => gsap.to('.s-bar', { scaleX: 1, duration: 1.4, ease: 'power3.out', stagger: 0.1 }),
-      }));
-    }
-
-    /* ── Canvas: mount on enter ── */
-    triggers.push(ScrollTrigger.create({
-      trigger: sectionRef.current, start: 'top 90%', once: true,
-      onEnter: () => setInView(true),
-    }));
-
-    return () => triggers.forEach(t => t.kill());
-  }, []);
+  }, { scope: sectionRef });
 
   const cats = [
     {
