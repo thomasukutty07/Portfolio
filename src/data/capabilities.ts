@@ -1,46 +1,41 @@
-import type { CapabilityGroup } from '../types';
+import type { CapabilityCategory } from '../types';
 
-export const CAPABILITY_GROUPS: CapabilityGroup[] = [
+export const CAPABILITIES_DATA: CapabilityCategory[] = [
   {
-    category: 'Frontend Development',
+    category: 'Frontend',
     skills: [
-      'React.js',
+      'React',
       'JavaScript (ES6+)',
-      'Tailwind CSS',
-      'HTML5 & Semantic Markup',
-      'CSS3 & Responsive Layouts',
-      'Component Architecture'
+      'TypeScript',
+      'HTML5 / CSS3',
+      'Tailwind CSS'
     ]
   },
   {
-    category: 'Backend & APIs',
+    category: 'Backend',
     skills: [
       'Node.js',
       'Express.js',
-      'REST API Design',
-      'JWT Authentication',
-      'MVC Architecture',
-      'Middleware Integration'
+      'REST APIs',
+      'MVC Architecture'
     ]
   },
   {
-    category: 'Databases & Storage',
+    category: 'Database',
     skills: [
       'MongoDB',
       'Mongoose ODM',
-      'Schema Modeling',
-      'CRUD Operations',
-      'Data Indexing & Queries'
+      'Schema Design',
+      'Data Modeling'
     ]
   },
   {
-    category: 'Workflow & Tools',
+    category: 'Product Engineering',
     skills: [
-      'Git & GitHub',
-      'Vite Build Tooling',
-      'Postman API Testing',
-      'Technical Documentation',
-      'VS Code & Terminal Workflows'
+      'JWT Authentication',
+      'Payment Integration (Razorpay, Stripe)',
+      'Third-Party API Integration',
+      'Git & GitHub'
     ]
   }
 ];

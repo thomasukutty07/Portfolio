@@ -1,51 +1,50 @@
 import React from 'react';
-import { IconArrowDown } from './Icons';
 
 export const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear();
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="border-t border-[#E6E4DD] py-12 bg-[#FAF9F5]" aria-label="Page Footer">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="text-xs text-[#5C5D58] font-mono">
-          © {currentYear} Thomasukutty Reji. Built with React &amp; Tailwind CSS.
+    <footer className="w-full bg-[#FAF9F5] border-t border-[#E6E4DD] py-12 px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+        {/* Name & Copyright */}
+        <div className="text-center sm:text-left">
+          <div className="font-bold text-sm tracking-tight text-[#141413]">
+            THOMASUKUTTY REJI
+          </div>
+          <p className="text-xs text-[#888780] mt-1">
+            © {new Date().getFullYear()} Thomasukutty Reji · Full-Stack Developer. All rights reserved.
+          </p>
         </div>
 
-        <div className="flex items-center gap-6 text-xs text-[#5C5D58] font-mono">
-          <a
-            href="https://github.com/thomasukutty07"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#141413] transition-colors"
-          >
-            GitHub
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-[#5C5D58]">
+          <a href="#work" className="hover:text-[#141413] transition-colors">
+            Work
           </a>
-          <a
-            href="https://www.linkedin.com/in/thomasukutty-reji-431b9027b/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#141413] transition-colors"
-          >
-            LinkedIn
+          <a href="#about" className="hover:text-[#141413] transition-colors">
+            About
           </a>
-          <a
-            href="mailto:thomasmern007@gmail.com"
-            className="hover:text-[#141413] transition-colors"
-          >
-            Email
+          <a href="#capabilities" className="hover:text-[#141413] transition-colors">
+            Capabilities
           </a>
+          <a href="#experience" className="hover:text-[#141413] transition-colors">
+            Experience
+          </a>
+          <a href="#contact" className="hover:text-[#141413] transition-colors">
+            Contact
+          </a>
+        </nav>
+
+        {/* Back to top */}
+        <div>
           <button
-            type="button"
             onClick={scrollToTop}
-            className="hover:text-[#141413] transition-colors flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A2B] rounded-sm py-0.5"
-            aria-label="Back to top"
+            className="text-xs font-semibold uppercase tracking-wider text-[#141413] hover:text-[#1E3A2B] transition-colors cursor-pointer"
+            aria-label="Scroll back to top"
           >
-            <span>Top</span>
-            <IconArrowDown size={12} className="rotate-180" />
+            Back to top ↑
           </button>
         </div>
       </div>

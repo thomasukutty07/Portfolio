@@ -1,103 +1,54 @@
 @import "tailwindcss";
 
-/* ═════════════════════════════════════════════════════════════════
-   LIGHT-FIRST EDITORIAL DESIGN SYSTEM
-   Thomasukutty Reji — Developer Portfolio
-   Palette: Warm Ivory, Charcoal, Soft Slate, Restrained Forest Green
-   ═════════════════════════════════════════════════════════════════ */
-
-@layer base {
-  :root {
-    --bg-page: #FAF9F5;
-    --bg-surface: #FFFFFF;
-    --bg-subtle: #F3F1EC;
-    --bg-muted: #EAE8E1;
-
-    --text-primary: #141413;
-    --text-secondary: #5C5D58;
-    --text-tertiary: #878882;
-
-    --border-subtle: #E6E4DD;
-    --border-medium: #D1CFBF;
-    --border-dark: #141413;
-
-    --accent: #1E3A2B;
-    --accent-hover: #2D5A43;
-    --accent-tint: rgba(30, 58, 43, 0.06);
-    --accent-light: #EBF2ED;
-
-    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-
-  html {
-    scroll-behavior: smooth;
-    background-color: var(--bg-page);
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    background-color: var(--bg-page);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Accessible focus indicators */
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+@theme {
+  --font-kanit: 'Kanit', sans-serif;
 }
 
-/* Editorial rule line */
-.editorial-rule {
-  height: 1px;
-  background-color: var(--border-subtle);
-  width: 100%;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Subtle editorial paper texture / card border */
-.card-border {
-  border: 1px solid var(--border-subtle);
-  background-color: var(--bg-surface);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+html {
+  scroll-behavior: smooth;
 }
 
-.card-border:hover {
-  border-color: var(--border-medium);
+html,
+body,
+#root {
+  background-color: #0C0C0C;
+  color: #D7E2EA;
+  font-family: 'Kanit', sans-serif;
+  min-height: 100vh;
 }
 
-/* Reduced Motion Override */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Hero Heading Gradient */
+.hero-heading {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Print Styles */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  nav, footer, .no-print {
-    display: none !important;
-  }
-  .card-border {
-    border: 1px solid #cccccc !important;
-    break-inside: avoid;
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0C0C0C;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #24272D;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3B3F47;
+}
+
+::selection {
+  background-color: #7621B0;
+  color: #FFFFFF;
 }

@@ -1,94 +1,109 @@
-import type { Project } from '../types';
+import type { Project, SecondaryProject } from '../types';
 
-export const PROJECTS: Project[] = [
+export const FEATURED_PROJECTS: Project[] = [
   {
     id: 'quickbite',
+    num: '01',
     title: 'QuickBite',
-    category: 'Full-Stack Application',
-    summary: 'A food delivery web application featuring menu browsing, cart management, payment processing, and order handling.',
-    details: [
-      'Built with React on the frontend and Node.js with Express on the backend.',
-      'Implemented JWT-based authentication with role-based access control.',
-      'Integrated Razorpay payment gateway for transaction handling.',
-      'Developed an admin dashboard for managing food items and viewing incoming orders.',
-      'Utilized Cloudinary for media storage and MongoDB for database persistence.'
+    category: 'Food Delivery Platform',
+    description:
+      'A full-stack food ordering and delivery web application that enables customers to explore diverse menus, add items to a dynamic cart, and execute authenticated online orders.',
+    contribution: [
+      'Built full-stack application using React, Node.js, Express, and MongoDB.',
+      'Integrated Razorpay payment gateway for secure online transactions.',
+      'Implemented JWT authentication with role-based access for users and administrators.',
+      'Developed an admin dashboard to manage menu items and live orders.'
     ],
-    technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Razorpay', 'Tailwind CSS', 'Vite'],
-    githubUrl: 'https://github.com/thomasukutty07',
-    liveUrl: 'https://quick-bite-neon.vercel.app/'
+    technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Razorpay', 'Tailwind CSS'],
+    liveUrl: 'https://silver-platypus-609adb.netlify.app/',
+    githubUrl: 'https://github.com/thomasmern007',
+    image: '/assets/projects/quickbite.png',
+    framingStyle: 'browser'
   },
   {
     id: 'fildex',
+    num: '02',
     title: 'Fildex Solutions',
-    category: 'Web Platform',
-    summary: 'A recruitment platform developed for an Irish recruitment company, featuring candidate management and service showcases.',
-    details: [
-      'Built a responsive web frontend using React and Tailwind CSS.',
-      'Constructed backend APIs using Node.js and MongoDB for listing and applicant management.',
-      'Implemented real-time messaging features using Socket.IO.',
-      'Integrated Stripe for subscription processing and Brevo API for email communication.',
-      'Developed administrative controls for job listings and candidate review.'
+    category: 'Recruitment SaaS Platform',
+    description:
+      'A talent acquisition and candidate management platform built for an Irish recruitment company, connecting employers with technical candidates across European tech hubs.',
+    contribution: [
+      'Developed responsive web interface using React and Tailwind CSS.',
+      'Built backend REST APIs with Node.js and Express to manage job postings and candidate records.',
+      'Implemented real-time messaging between candidates and recruiters using Socket.IO.',
+      'Integrated Stripe for recurring subscriptions and Brevo API for transactional email services.'
     ],
-    technologies: ['React', 'Node.js', 'MongoDB', 'Socket.IO', 'Stripe', 'Tailwind CSS', 'Vite'],
-    githubUrl: 'https://github.com/thomasukutty07',
-    liveUrl: 'https://fildex.ie'
+    technologies: ['React', 'Node.js', 'MongoDB', 'Socket.IO', 'Stripe', 'Brevo API', 'Tailwind CSS'],
+    liveUrl: 'https://fildex.ie',
+    githubUrl: 'https://github.com/thomasmern007',
+    image: '/assets/projects/fildex.png',
+    framingStyle: 'edge'
   },
   {
     id: 'urbanhunt',
+    num: '03',
     title: 'UrbanHunt',
     category: 'E-Commerce Platform',
-    summary: 'A full-stack e-commerce web application with product catalogs, user authentication, and shopping cart functionality.',
-    details: [
-      'Architected RESTful APIs using Express and Node.js connected to MongoDB.',
-      'Implemented authentication using JSON Web Tokens (JWT) and route protection.',
-      'Created an admin interface for managing product catalog inventory and orders.',
-      'Engineered shopping cart persistence and user checkout flow.'
+    description:
+      'A responsive digital storefront featuring multi-category product catalog browsing, persistent shopping cart management, user accounts, and administrative controls.',
+    contribution: [
+      'Engineered storefront UI with React and Tailwind CSS with category filters and mobile responsiveness.',
+      'Built RESTful endpoints on Node.js and Express for catalog querying and order state handling.',
+      'Implemented JWT-based user authentication and protected admin routes for product management.',
+      'Structured MongoDB schemas to support product catalogs, user profiles, and orders.'
     ],
     technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'JWT', 'Tailwind CSS'],
+    liveUrl: 'https://e-com-1-8ewb.onrender.com/#/shop/home',
     githubUrl: 'https://github.com/thomasukutty07/UrbanHut',
-    liveUrl: 'https://e-com-1-8ewb.onrender.com/#/shop/home'
+    image: '/assets/projects/urbanhunt.png',
+    framingStyle: 'asymmetric'
   },
   {
     id: 'baytebar',
+    num: '04',
     title: 'Baytebar IT Solutions',
-    category: 'Corporate Website',
-    summary: 'A corporate web platform built for an IT services company, showcasing services, team members, and company background.',
-    details: [
-      'Developed the frontend interface with React and Tailwind CSS.',
-      'Focused on responsive layout design across desktop, tablet, and mobile viewports.',
-      'Structured clean component hierarchies and modular code organization.',
-      'Maintained version control using Git and documented system features.'
+    category: 'Corporate Web Platform',
+    description:
+      'A corporate web presence built for an IT consulting and software studio, articulating service capabilities, digital solutions, and client inquiry channels.',
+    contribution: [
+      'Engineered modern, responsive front-end interface using React, Tailwind CSS, and Vite.',
+      'Constructed modular component hierarchy for clean maintenance and fast page rendering.',
+      'Integrated client inquiry workflows with front-end form validation.',
+      'Optimized layout performance and cross-viewport accessibility across all screen sizes.'
     ],
-    technologies: ['React', 'Tailwind CSS', 'Vite'],
-    githubUrl: 'https://github.com/thomasukutty07',
-    liveUrl: 'https://baytebar.com/'
-  },
+    technologies: ['React', 'Tailwind CSS', 'Vite', 'REST APIs'],
+    liveUrl: 'https://www.baytebar.com/',
+    githubUrl: 'https://github.com/thomasmern007',
+    image: '/assets/projects/baytebar.png',
+    framingStyle: 'centered'
+  }
+];
+
+export const SECONDARY_PROJECTS: SecondaryProject[] = [
   {
     id: 'hoobank',
     title: 'HooBank',
-    category: 'UI/UX Concept',
-    summary: 'A modern banking interface concept demonstrating structured design tokens, responsive cards, and clean typography.',
-    details: [
-      'Implemented responsive component layouts using Tailwind CSS utility patterns.',
-      'Structured modular card components with visual hierarchy.',
-      'Applied accessible color contrast across light and dark surfaces.'
-    ],
+    category: 'Fintech Landing Interface',
     technologies: ['React', 'Tailwind CSS', 'Vite'],
-    githubUrl: 'https://github.com/thomasukutty07',
-    liveUrl: 'https://stunning-scone-45b046.netlify.app/'
+    description: 'Modern banking interface with responsive layout, clean component architecture, and structured design tokens.',
+    liveUrl: 'https://stunning-scone-45b046.netlify.app/',
+    githubUrl: 'https://github.com/thomasmern007'
   },
   {
     id: 'cineflix',
     title: 'CineFlix',
-    category: 'API Integration',
-    summary: 'A movie discovery web application integrating the TMDB REST API with client-side search and category filtering.',
-    details: [
-      'Connected to external TMDB endpoints to fetch and render movie metadata.',
-      'Implemented real-time client-side search query handling and filter states.',
-      'Built responsive media grid views with modal detail cards.'
-    ],
-    technologies: ['React', 'TMDB API', 'Tailwind CSS', 'Vite'],
-    githubUrl: 'https://github.com/thomasukutty07',
-    liveUrl: 'https://dynamic-cocada-c83d76.netlify.app/'
+    category: 'Movie Discovery Web App',
+    technologies: ['React', 'TMDB REST API', 'Tailwind CSS', 'Vite'],
+    description: 'Entertainment discovery web application integrating TMDB APIs for real-time movie queries, posters, and category exploration.',
+    liveUrl: 'https://dynamic-cocada-c83d76.netlify.app/',
+    githubUrl: 'https://github.com/thomasmern007'
+  },
+  {
+    id: 'church-cms',
+    title: 'Church Management System',
+    category: 'Administrative MERN Platform',
+    technologies: ['MongoDB', 'Express', 'React', 'Node.js'],
+    description: 'Internal administrative web platform for organizing community member records, family groupings, and role-based permissions.',
+    githubUrl: 'https://github.com/thomasmern007'
   }
 ];

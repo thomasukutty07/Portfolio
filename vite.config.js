@@ -4,4 +4,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
+  server: {
+    port: 5174,
+    host: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'motion-vendor': ['framer-motion', 'lenis'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 })

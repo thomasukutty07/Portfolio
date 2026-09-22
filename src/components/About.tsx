@@ -1,75 +1,69 @@
 import React from 'react';
-import { IconMapPin } from './Icons';
 
 export const About: React.FC = () => {
   return (
-    <section
-      id="about"
-      aria-label="About Thomasukutty Reji"
-      className="py-24 border-b border-[#E6E4DD]"
-    >
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column (Heading + Bio) */}
-          <div className="lg:col-span-7">
-            <span className="text-xs uppercase font-mono tracking-widest text-[#5C5D58] block mb-2">
-              Background & Approach
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#141413] mb-8">
-              Engineering with clarity and practical implementation.
-            </h2>
+    <section id="about" className="relative w-full py-20 sm:py-32 px-6 sm:px-10 max-w-7xl mx-auto border-t border-[#E6E4DD]">
+      {/* Section Header */}
+      <div className="flex items-center gap-2 mb-10 sm:mb-14">
+        <span className="w-2 h-2 rounded-full bg-[#1E3A2B]" aria-hidden="true" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-[#888780]">
+          About Me
+        </span>
+      </div>
 
-            <div className="space-y-5 text-[#5C5D58] text-base sm:text-lg leading-relaxed font-normal">
-              <p>
-                I am a full-stack developer based in Kerala, India, focusing on the MERN stack (MongoDB, Express.js, React, and Node.js). My background involves developing applications that combine structured backend APIs with responsive, accessible user interfaces.
-              </p>
-              <p>
-                In my development process, I prioritize clean architectural separation: modeling relational and document schemas thoughtfully, writing predictable REST endpoints, handling authentication and authorization cleanly, and delivering frontend code that performs consistently across devices.
-              </p>
-              <p>
-                Whether working as part of a team at Baytebar IT Solutions or delivering custom web applications for clients, I value clear technical communication, Git-based version control, and building features that solve genuine operational problems.
-              </p>
+      {/* Dominant Philosophy Statement */}
+      <div className="max-w-5xl mb-16 sm:mb-20">
+        <blockquote className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#141413] leading-[1.12] tracking-tight">
+          &ldquo;I enjoy turning ideas into software people can actually use.&rdquo;
+        </blockquote>
+      </div>
+
+      {/* Grid: 3D Architectural Sculpture on Left, Narrative & Verified Facts on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        {/* Left Column: 3D Design & System Sculpture (6 cols) */}
+        <div className="lg:col-span-6">
+          <div className="relative rounded-md border border-[#E6E4DD] bg-[#FFFFFF] overflow-hidden shadow-[0_16px_40px_-12px_rgba(20,20,19,0.06)]">
+            <img
+              src="/assets/generated/about.jpg"
+              alt="Architectural 3D sculpture of intersecting smoked glass and charcoal planes symbolizing modular software craft"
+              className="w-full h-auto object-cover aspect-[4/3]"
+              loading="lazy"
+            />
+            <div className="p-3 bg-[#FAF9F5] border-t border-[#E6E4DD] flex items-center justify-between text-[11px] font-mono text-[#888780]">
+              <span>SPATIAL COMPOSITION · SYSTEM ARCHITECTURE</span>
+              <span>3D STUDY</span>
             </div>
           </div>
+        </div>
 
-          {/* Right Column (Key Principles / Summary Card) */}
-          <div className="lg:col-span-5 card-border rounded-lg p-6 sm:p-8 bg-[#FFFFFF]">
-            <h3 className="text-xs uppercase font-mono tracking-wider text-[#878882] pb-3 mb-5 border-b border-[#E6E4DD]">
-              Core Focus Areas
-            </h3>
+        {/* Right Column: Narrative & Verified Engineering Scope (6 cols) */}
+        <div className="lg:col-span-6 space-y-6">
+          <div className="space-y-4 text-base sm:text-lg text-[#5C5D58] leading-relaxed">
+            <p>
+              I am a full-stack developer based in Kerala, India, specializing in building modern web applications and digital products. My daily work revolves around React, Node.js, Express, and MongoDB.
+            </p>
+            <p>
+              I bridge the gap between intuitive user interfaces and reliable backend systems. Rather than relying on superficial gimmicks, I focus on clean component architectures, robust REST APIs, and database models that hold up under real-world usage.
+            </p>
+          </div>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-base font-semibold text-[#141413] mb-1.5">
-                  Full-Stack Architecture
-                </h4>
-                <p className="text-sm text-[#5C5D58] leading-relaxed">
-                  Connecting React client interfaces with Node.js/Express backends and MongoDB databases for cohesive data flow.
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-base font-semibold text-[#141413] mb-1.5">
-                  API & Authentication Design
-                </h4>
-                <p className="text-sm text-[#5C5D58] leading-relaxed">
-                  Implementing token-based JWT authentication, route protection, and structured REST endpoints.
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-base font-semibold text-[#141413] mb-1.5">
-                  Responsive Frontend Engineering
-                </h4>
-                <p className="text-sm text-[#5C5D58] leading-relaxed">
-                  Building modular components with Tailwind CSS that adapt cleanly to desktop, tablet, and mobile screens.
-                </p>
-              </div>
+          {/* Key Facts Checklist */}
+          <div className="pt-4 border-t border-[#E6E4DD] grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1">
+              <span className="text-[#888780] block text-[11px] uppercase tracking-wider">Role &amp; Focus</span>
+              <span className="font-semibold text-[#141413]">Full-Stack Web Developer</span>
             </div>
-
-            <div className="mt-8 pt-5 border-t border-[#E6E4DD] flex items-center gap-2 text-xs text-[#5C5D58]">
-              <IconMapPin size={14} className="text-[#1E3A2B]" />
-              <span>Based in Idukki, Kerala, India</span>
+            <div className="space-y-1">
+              <span className="text-[#888780] block text-[11px] uppercase tracking-wider">Primary Stack</span>
+              <span className="font-semibold text-[#141413]">React, Node.js, Express, MongoDB</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[#888780] block text-[11px] uppercase tracking-wider">Location</span>
+              <span className="font-semibold text-[#141413]">Idukki, Kerala, India</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[#888780] block text-[11px] uppercase tracking-wider">Languages</span>
+              <span className="font-semibold text-[#141413]">English, Malayalam</span>
             </div>
           </div>
         </div>

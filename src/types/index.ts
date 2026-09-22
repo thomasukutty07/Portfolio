@@ -1,47 +1,45 @@
 export interface Project {
   id: string;
+  num: string;
   title: string;
   category: string;
-  summary: string;
-  details: string[];
+  description: string;
+  contribution: string[];
   technologies: string[];
-  githubUrl?: string;
   liveUrl?: string;
+  githubUrl?: string;
+  image: string;
+  framingStyle: 'browser' | 'edge' | 'asymmetric' | 'centered';
+}
+
+export interface SecondaryProject {
+  id: string;
+  title: string;
+  category: string;
+  technologies: string[];
+  description: string;
+  liveUrl?: string;
+  githubUrl?: string;
+}
+
+export interface CapabilityCategory {
+  category: string;
+  skills: string[];
 }
 
 export interface ExperienceItem {
+  id: string;
   role: string;
-  company?: string;
+  company: string;
   period: string;
+  location?: string;
+  description: string;
   responsibilities: string[];
-  technologies?: string[];
-}
-
-export interface CapabilityGroup {
-  category: string;
-  skills: string[];
+  technologies: string[];
 }
 
 export interface EducationItem {
   degree: string;
   institution: string;
   period: string;
-}
-
-export interface ContactFormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
-export interface FormStatus {
-  submitting: boolean;
-  success: boolean;
-  error: string | null;
-}
-
-export interface NavSection {
-  id: string;
-  label: string;
 }
