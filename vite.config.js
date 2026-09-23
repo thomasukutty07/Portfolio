@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'motion-vendor': ['framer-motion', 'lenis'],
+          'motion-vendor': ['framer-motion'],
         },
       },
     },
