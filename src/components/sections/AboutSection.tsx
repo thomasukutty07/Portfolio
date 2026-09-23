@@ -5,7 +5,7 @@ import { AnimatedText } from '../ui/AnimatedText';
 
 export const AboutSection: React.FC = () => {
   const aboutText =
-    "With more than five years of experience in design, i focus on branding, web design, and user experience, i truly enjoy working with businesses that aim to stand out and present their best image. Let's build something incredible together!";
+    "As a full-stack developer, I specialize in building scalable web applications and digital products using React, Node.js, and MongoDB. I focus on bridging intuitive user interfaces with robust backend architectures. Let's build something incredible together!";
 
   return (
     <section
@@ -18,12 +18,12 @@ export const AboutSection: React.FC = () => {
         x={-80}
         y={0}
         duration={0.9}
-        className="absolute top-[4%] left-[1%] sm:left-[2%] md:left-[4%] z-10 pointer-events-none"
+        className="absolute top-[3%] sm:top-[4%] left-[1%] sm:left-[2%] md:left-[4%] z-10 pointer-events-none"
       >
         <img
           src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png"
           alt="Moon 3D icon"
-          className="w-[120px] sm:w-[160px] md:w-[210px] h-auto object-contain drop-shadow-xl"
+          className="w-[65px] sm:w-[120px] md:w-[170px] lg:w-[210px] h-auto object-contain drop-shadow-xl opacity-40 sm:opacity-90 md:opacity-100"
           loading="lazy"
         />
       </FadeIn>
@@ -34,12 +34,12 @@ export const AboutSection: React.FC = () => {
         x={-80}
         y={0}
         duration={0.9}
-        className="absolute bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%] z-10 pointer-events-none"
+        className="absolute bottom-[5%] sm:bottom-[8%] left-[2%] sm:left-[6%] md:left-[10%] z-10 pointer-events-none"
       >
         <img
           src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png"
           alt="3D object decoration"
-          className="w-[100px] sm:w-[140px] md:w-[180px] h-auto object-contain drop-shadow-xl"
+          className="w-[55px] sm:w-[100px] md:w-[140px] lg:w-[180px] h-auto object-contain drop-shadow-xl opacity-40 sm:opacity-90 md:opacity-100"
           loading="lazy"
         />
       </FadeIn>
@@ -50,12 +50,12 @@ export const AboutSection: React.FC = () => {
         x={80}
         y={0}
         duration={0.9}
-        className="absolute top-[4%] right-[1%] sm:right-[2%] md:right-[4%] z-10 pointer-events-none"
+        className="absolute top-[3%] sm:top-[4%] right-[1%] sm:right-[2%] md:right-[4%] z-10 pointer-events-none"
       >
         <img
           src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png"
           alt="Lego 3D icon"
-          className="w-[120px] sm:w-[160px] md:w-[210px] h-auto object-contain drop-shadow-xl"
+          className="w-[65px] sm:w-[120px] md:w-[170px] lg:w-[210px] h-auto object-contain drop-shadow-xl opacity-40 sm:opacity-90 md:opacity-100"
           loading="lazy"
         />
       </FadeIn>
@@ -66,12 +66,12 @@ export const AboutSection: React.FC = () => {
         x={80}
         y={0}
         duration={0.9}
-        className="absolute bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%] z-10 pointer-events-none"
+        className="absolute bottom-[5%] sm:bottom-[8%] right-[2%] sm:right-[6%] md:right-[10%] z-10 pointer-events-none"
       >
         <img
           src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png"
           alt="3D group decoration"
-          className="w-[130px] sm:w-[170px] md:w-[220px] h-auto object-contain drop-shadow-xl"
+          className="w-[70px] sm:w-[120px] md:w-[170px] lg:w-[220px] h-auto object-contain drop-shadow-xl opacity-40 sm:opacity-90 md:opacity-100"
           loading="lazy"
         />
       </FadeIn>

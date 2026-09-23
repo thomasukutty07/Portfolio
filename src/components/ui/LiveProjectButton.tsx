@@ -15,11 +15,11 @@ export const LiveProjectButton: React.FC<LiveProjectButtonProps> = ({
 }) => {
   const content = (
     <span
-      className={`inline-flex items-center justify-center rounded-full border border-[#D7E2EA]/40 text-[#D7E2EA] font-semibold uppercase tracking-widest text-xs sm:text-sm transition-all duration-300 hover:border-[#D7E2EA] hover:bg-[#D7E2EA]/10 hover:scale-105 active:scale-95 select-none whitespace-nowrap cursor-pointer ${className}`}
+      className={`inline-flex items-center justify-center rounded-full border border-[#D7E2EA]/40 text-[#D7E2EA] font-semibold uppercase tracking-wider sm:tracking-widest text-[9px] sm:text-xs md:text-sm transition-all duration-300 hover:border-[#D7E2EA] hover:bg-[#D7E2EA]/10 hover:scale-105 active:scale-95 select-none whitespace-nowrap cursor-pointer ${className}`}
       style={{
-        padding: '13px 32px',
+        padding: 'clamp(6px, 1.2vw, 13px) clamp(10px, 2.2vw, 30px)',
         lineHeight: 1,
-        letterSpacing: '0.16em',
+        letterSpacing: '0.1em',
       }}
     >
       {label}

@@ -17,25 +17,25 @@ export const App: React.FC = () => {
         <HeroSection />
 
         {/* Spacer between Hero and Marquee */}
-        <div style={{ height: '150px' }} className="bg-[#0C0C0C]" />
+        <div className="h-14 sm:h-24 md:h-32 bg-[#0C0C0C]" />
 
         {/* 2. Marquee Section */}
         <MarqueeSection />
 
         {/* Spacer */}
-        <div style={{ height: '150px' }} className="bg-[#0C0C0C]" />
+        <div className="h-14 sm:h-24 md:h-32 bg-[#0C0C0C]" />
 
         {/* 3. About Section */}
         <AboutSection />
 
         {/* Spacer */}
-        <div style={{ height: '150px' }} className="bg-[#0C0C0C]" />
+        <div className="h-14 sm:h-24 md:h-32 bg-[#0C0C0C]" />
 
         {/* 4. Services Section */}
         <ServicesSection />
 
         {/* Spacer */}
-        <div style={{ height: '150px' }} className="bg-[#0C0C0C]" />
+        <div className="h-14 sm:h-24 md:h-32 bg-[#0C0C0C]" />
 
         {/* 5. Projects Section */}
         <ProjectsSection />
@@ -44,26 +44,26 @@ export const App: React.FC = () => {
       {/* Footer / Contact Section - Centered Horizontally & Vertically */}
       <footer
         id="contact"
-        className="w-full bg-[#0C0C0C] border-t border-[#D7E2EA]/10 min-h-[50vh] sm:min-h-[60vh] flex flex-col items-center justify-center text-center px-6 md:px-10 py-20 sm:py-28 relative z-20"
+        className="w-full bg-[#0C0C0C] border-t border-[#D7E2EA]/10 min-h-[45vh] sm:min-h-[55vh] flex flex-col items-center justify-center text-center px-4 sm:px-8 md:px-10 py-16 sm:py-24 md:py-28 relative z-20"
       >
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center gap-6 sm:gap-8">
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center gap-5 sm:gap-8">
           <FadeIn delay={0} y={20} className="flex flex-col items-center justify-center text-center">
-            <span className="hero-heading font-black text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight text-center">
+            <span className="hero-heading font-black text-3xl sm:text-5xl md:text-6xl uppercase tracking-tight text-center">
               Thomas
             </span>
-            <p className="text-[#D7E2EA]/70 text-sm sm:text-base md:text-lg uppercase tracking-wider mt-3 max-w-xl text-center">
-              A 3D creator driven by crafting striking and unforgettable projects
+            <p className="text-[#D7E2EA]/70 text-xs sm:text-sm md:text-base uppercase tracking-wider mt-2.5 max-w-xl text-center px-2">
+              Full-stack developer building scalable web apps &amp; digital products
             </p>
           </FadeIn>
 
           {/* Contact Button with generous spacing */}
-          <FadeIn delay={0.15} y={20} className="my-3 sm:my-5 flex justify-center">
-            <ContactButton href="mailto:hello@thomas.design" />
+          <FadeIn delay={0.15} y={20} className="my-2 sm:my-4 flex justify-center">
+            <ContactButton href="mailto:thomasmern007@gmail.com" />
           </FadeIn>
 
           {/* Centered Navigation */}
           <FadeIn delay={0.25} y={20}>
-            <nav className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm font-medium uppercase tracking-widest text-[#D7E2EA]/60">
+            <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-10 text-[11px] sm:text-xs md:text-sm font-medium uppercase tracking-widest text-[#D7E2EA]/60">
               <a href="#about" className="hover:text-[#D7E2EA] transition-colors duration-200">
                 About
               </a>
@@ -80,7 +80,7 @@ export const App: React.FC = () => {
           </FadeIn>
 
           <FadeIn delay={0.3} y={20}>
-            <span className="text-[#D7E2EA]/40 text-xs uppercase tracking-widest mt-2 block">
+            <span className="text-[#D7E2EA]/40 text-[10px] sm:text-xs uppercase tracking-widest mt-1 block">
               &copy; {new Date().getFullYear()} Thomas. All rights reserved.
             </span>
           </FadeIn>
